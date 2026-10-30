@@ -1,0 +1,41 @@
+# Dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Database
+*.sqlite
+*.sqlite-journal
+*.sqlite-shm
+*.sqlite-wal
+*.db
+
+# Storage & Uploads
+storage/documents/*
+!storage/documents/.gitkeep
+Backend/storage/documents/*
+!Backend/storage/documents/.gitkeep
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Flutter / Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+*.iml
+.idea/
+.vscode/
+
+# Duplicate temporary directories
+APP_frontend'/
+
+# OS generated
+.DS_Store
+Thumbs.db
+
+PRD.MD

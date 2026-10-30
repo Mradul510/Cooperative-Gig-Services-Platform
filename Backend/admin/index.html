@@ -1,0 +1,807 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CoopGig Admin Dashboard</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary:    #0EA5E9;
+      --primary-dk: #0284C7;
+      --bg:         #FFFFFF;
+      --bg-alt:     #F8FAFC;
+      --sidebar-bg: #0F172A;
+      --text:       #1E293B;
+      --text-muted: #64748B;
+      --border:     #E2E8F0;
+      --success:    #10B981;
+      --warning:    #F59E0B;
+      --danger:     #EF4444;
+      --card-shadow: 0 1px 3px rgba(0,0,0,.08), 0 1px 2px rgba(0,0,0,.06);
+    }
+
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg-alt); color: var(--text); }
+
+    /* ── Login overlay ───────────────────────────────────────────────── */
+    #login-overlay {
+      position: fixed; inset: 0; background: var(--sidebar-bg);
+      display: flex; align-items: center; justify-content: center; z-index: 9999;
+    }
+    #login-overlay.hidden { display: none; }
+    .login-card {
+      background: var(--bg); border-radius: 12px; padding: 2.5rem 2rem;
+      width: 360px; box-shadow: 0 20px 40px rgba(0,0,0,.3);
+    }
+    .login-card h1 { font-size: 1.5rem; margin-bottom: .25rem; color: var(--primary); }
+    .login-card p  { color: var(--text-muted); font-size: .875rem; margin-bottom: 1.5rem; }
+    .form-group    { margin-bottom: 1rem; }
+    .form-group label { display: block; font-size: .8125rem; font-weight: 600; margin-bottom: .35rem; color: var(--text); }
+    .form-group input, .form-group select, .form-group textarea {
+      width: 100%; padding: .6rem .75rem; border: 1px solid var(--border);
+      border-radius: 6px; font-size: .875rem; outline: none; background: var(--bg);
+      color: var(--text); transition: border-color .15s;
+    }
+    .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--primary); }
+    .btn {
+      display: inline-flex; align-items: center; gap: .4rem;
+      padding: .55rem 1.1rem; border: none; border-radius: 6px;
+      font-size: .875rem; font-weight: 600; cursor: pointer; transition: background .15s, opacity .15s;
+    }
+    .btn-primary   { background: var(--primary);  color: #fff; }
+    .btn-primary:hover { background: var(--primary-dk); }
+    .btn-success   { background: var(--success);  color: #fff; }
+    .btn-danger    { background: var(--danger);   color: #fff; }
+    .btn-warning   { background: var(--warning);  color: #fff; }
+    .btn-ghost     { background: transparent; color: var(--text-muted); border: 1px solid var(--border); }
+    .btn-ghost:hover { background: var(--bg-alt); }
+    .btn-sm        { padding: .3rem .7rem; font-size: .8rem; }
+    .btn:disabled  { opacity: .55; cursor: not-allowed; }
+    #login-err { color: var(--danger); font-size: .8125rem; margin-top: .75rem; min-height: 1.2em; }
+
+    /* ── Layout ──────────────────────────────────────────────────────── */
+    #app { display: flex; height: 100vh; overflow: hidden; }
+    #app.hidden { display: none; }
+
+    /* Sidebar */
+    #sidebar {
+      width: 230px; min-width: 230px; background: var(--sidebar-bg);
+      display: flex; flex-direction: column; padding: 1.25rem 0;
+      overflow-y: auto;
+    }
+    .sidebar-logo {
+      padding: 0 1.25rem 1.5rem;
+      font-size: 1.1rem; font-weight: 700; color: var(--primary);
+      letter-spacing: -.3px;
+    }
+    .sidebar-logo span { color: #94A3B8; font-weight: 400; font-size: .75rem; display: block; }
+    .nav-item {
+      display: flex; align-items: center; gap: .65rem;
+      padding: .6rem 1.25rem; color: #94A3B8; font-size: .875rem;
+      cursor: pointer; border-left: 3px solid transparent; transition: all .15s;
+      user-select: none;
+    }
+    .nav-item:hover  { background: rgba(255,255,255,.05); color: #fff; }
+    .nav-item.active { background: rgba(14,165,233,.12); color: var(--primary); border-left-color: var(--primary); }
+    .nav-icon { font-size: 1rem; }
+    .sidebar-footer {
+      margin-top: auto; padding: 1rem 1.25rem;
+      border-top: 1px solid rgba(255,255,255,.08);
+    }
+    .sidebar-footer .user-info { color: #94A3B8; font-size: .8rem; margin-bottom: .6rem; }
+    .sidebar-footer .user-info strong { color: #e2e8f0; display: block; }
+
+    /* Main content */
+    #main { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
+    #topbar {
+      background: var(--bg); border-bottom: 1px solid var(--border);
+      padding: .9rem 1.5rem; display: flex; align-items: center; justify-content: space-between;
+    }
+    #topbar h2 { font-size: 1.125rem; font-weight: 700; }
+    #content { flex: 1; overflow-y: auto; padding: 1.5rem; }
+
+    /* ── Cards / Tables ──────────────────────────────────────────────── */
+    .card {
+      background: var(--bg); border: 1px solid var(--border);
+      border-radius: 10px; box-shadow: var(--card-shadow); padding: 1.25rem;
+      margin-bottom: 1.25rem;
+    }
+    .card-title { font-size: 1rem; font-weight: 700; margin-bottom: 1rem; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .stat-card {
+      background: var(--bg); border: 1px solid var(--border); border-radius: 10px;
+      padding: 1.1rem 1.25rem; box-shadow: var(--card-shadow);
+    }
+    .stat-label { font-size: .75rem; color: var(--text-muted); text-transform: uppercase; letter-spacing: .5px; }
+    .stat-value { font-size: 1.75rem; font-weight: 700; color: var(--text); margin-top: .25rem; }
+    .stat-unit  { font-size: .875rem; color: var(--text-muted); }
+
+    table { width: 100%; border-collapse: collapse; font-size: .875rem; }
+    th { text-align: left; padding: .6rem .9rem; background: var(--bg-alt); color: var(--text-muted); font-size: .75rem; text-transform: uppercase; letter-spacing: .5px; border-bottom: 1px solid var(--border); }
+    td { padding: .65rem .9rem; border-bottom: 1px solid var(--border); vertical-align: middle; }
+    tr:last-child td { border-bottom: none; }
+    tr:hover td { background: var(--bg-alt); }
+    .table-wrap { overflow-x: auto; border-radius: 8px; border: 1px solid var(--border); }
+
+    /* Badges */
+    .badge {
+      display: inline-block; padding: .2rem .55rem; border-radius: 999px;
+      font-size: .7rem; font-weight: 700; letter-spacing: .3px; text-transform: uppercase;
+    }
+    .badge-pending  { background: #FEF3C7; color: #92400E; }
+    .badge-approved { background: #D1FAE5; color: #065F46; }
+    .badge-rejected { background: #FEE2E2; color: #991B1B; }
+    .badge-open     { background: #FEF3C7; color: #92400E; }
+    .badge-resolved { background: #D1FAE5; color: #065F46; }
+    .badge-orphan   { background: #FEE2E2; color: #991B1B; }
+    .badge-ok       { background: #D1FAE5; color: #065F46; }
+    .badge-customer { background: #EFF6FF; color: #1D4ED8; }
+    .badge-worker   { background: #F0FDF4; color: #15803D; }
+    .badge-admin    { background: #FDF4FF; color: #7E22CE; }
+
+    /* Alerts */
+    .alert { padding: .8rem 1rem; border-radius: 8px; font-size: .875rem; margin-bottom: 1rem; }
+    .alert-success { background: #D1FAE5; color: #065F46; border: 1px solid #A7F3D0; }
+    .alert-danger  { background: #FEE2E2; color: #991B1B; border: 1px solid #FECACA; }
+    .alert-info    { background: #E0F2FE; color: #0C4A6E; border: 1px solid #BAE6FD; }
+
+    /* Misc helpers */
+    .flex { display: flex; }
+    .gap-2 { gap: .5rem; }
+    .gap-3 { gap: .75rem; }
+    .items-center { align-items: center; }
+    .justify-between { justify-content: space-between; }
+    .mt-1 { margin-top: .25rem; }
+    .mt-2 { margin-top: .5rem; }
+    .mt-3 { margin-top: .75rem; }
+    .text-muted { color: var(--text-muted); font-size: .8rem; }
+    .text-sm    { font-size: .875rem; }
+    .font-mono  { font-family: 'Courier New', monospace; font-size: .8rem; }
+    .w-full     { width: 100%; }
+    .inline-form { display: flex; gap: .5rem; align-items: flex-end; flex-wrap: wrap; }
+    .inline-form .form-group { margin-bottom: 0; }
+    .dots-loader::after { content: ''; animation: dots 1.2s infinite; }
+    @keyframes dots { 0% { content: ''; } 33% { content: '.'; } 66% { content: '..'; } 100% { content: '...'; } }
+
+    /* Pagination */
+    .pagination { display: flex; gap: .4rem; margin-top: 1rem; align-items: center; }
+    .page-btn   { padding: .3rem .65rem; border: 1px solid var(--border); border-radius: 5px; background: var(--bg); cursor: pointer; font-size: .8125rem; }
+    .page-btn.active { background: var(--primary); color: #fff; border-color: var(--primary); }
+    .page-btn:disabled { opacity: .45; cursor: not-allowed; }
+
+    /* Service edit inline */
+    .editable { cursor: pointer; border-bottom: 1px dashed var(--border); }
+    .editable:hover { border-color: var(--primary); color: var(--primary); }
+
+    /* Reason modal */
+    .modal-backdrop {
+      position: fixed; inset: 0; background: rgba(0,0,0,.5);
+      display: flex; align-items: center; justify-content: center; z-index: 1000;
+    }
+    .modal-backdrop.hidden { display: none; }
+    .modal {
+      background: var(--bg); border-radius: 12px; padding: 1.75rem;
+      width: 420px; max-width: 95vw; box-shadow: 0 20px 40px rgba(0,0,0,.25);
+    }
+    .modal h3  { font-size: 1rem; margin-bottom: .5rem; }
+    .modal p   { font-size: .875rem; color: var(--text-muted); margin-bottom: 1rem; }
+    .modal textarea { width: 100%; min-height: 80px; padding: .6rem .75rem; border: 1px solid var(--border); border-radius: 6px; resize: vertical; font-size: .875rem; }
+
+    #toast {
+      position: fixed; bottom: 1.5rem; right: 1.5rem;
+      background: var(--sidebar-bg); color: #fff; padding: .75rem 1.25rem;
+      border-radius: 8px; font-size: .875rem; z-index: 9998;
+      opacity: 0; transform: translateY(10px); transition: all .25s;
+      max-width: 340px;
+    }
+    #toast.show { opacity: 1; transform: translateY(0); }
+    #toast.success { border-left: 3px solid var(--success); }
+    #toast.error   { border-left: 3px solid var(--danger); }
+  </style>
+</head>
+<body>
+
+<!-- Login overlay -->
+<div id="login-overlay">
+  <div class="login-card">
+    <h1>🏪 CoopGig</h1>
+    <p>Admin Dashboard — Sign in to continue</p>
+    <div class="form-group">
+      <label>Email or Mobile</label>
+      <input id="login-id" type="text" placeholder="admin@coopgig.com" value="admin@coopgig.com" />
+    </div>
+    <div class="form-group">
+      <label>Password</label>
+      <input id="login-pw" type="password" placeholder="••••••••" value="Admin@123" />
+    </div>
+    <button class="btn btn-primary w-full" id="login-btn" onclick="doLogin()">Sign In</button>
+    <div id="login-err"></div>
+  </div>
+</div>
+
+<!-- Main app -->
+<div id="app" class="hidden">
+  <nav id="sidebar">
+    <div class="sidebar-logo">CoopGig <span>Admin Dashboard</span></div>
+    <div class="nav-item active" data-section="verifications" onclick="navigate('verifications')">
+      <span class="nav-icon">✅</span> Verifications
+    </div>
+    <div class="nav-item" data-section="users" onclick="navigate('users')">
+      <span class="nav-icon">👥</span> Users
+    </div>
+    <div class="nav-item" data-section="services" onclick="navigate('services')">
+      <span class="nav-icon">🛠</span> Services
+    </div>
+    <div class="nav-item" data-section="grievances" onclick="navigate('grievances')">
+      <span class="nav-icon">📋</span> Grievances
+    </div>
+    <div class="nav-item" data-section="health" onclick="navigate('health')">
+      <span class="nav-icon">💚</span> Health
+    </div>
+    <div class="nav-item" data-section="storage" onclick="navigate('storage')">
+      <span class="nav-icon">📁</span> Storage
+    </div>
+    <div class="sidebar-footer">
+      <div class="user-info">
+        <strong id="sidebar-name">—</strong>
+        Signed in as admin
+      </div>
+      <button class="btn btn-ghost btn-sm w-full" onclick="doLogout()">Sign Out</button>
+    </div>
+  </nav>
+
+  <div id="main">
+    <div id="topbar">
+      <h2 id="page-title">Verifications</h2>
+      <span class="text-muted" id="topbar-meta"></span>
+    </div>
+    <div id="content">
+      <div class="dots-loader" id="content-loader" style="color:var(--text-muted);padding:2rem;">Loading</div>
+    </div>
+  </div>
+</div>
+
+<!-- Rejection reason modal -->
+<div id="reason-modal" class="modal-backdrop hidden">
+  <div class="modal">
+    <h3>Rejection Reason</h3>
+    <p>Please provide a reason for rejecting this document. This will be visible to the worker.</p>
+    <textarea id="reason-text" placeholder="e.g. Document is blurry or illegible..."></textarea>
+    <div class="flex gap-2 mt-3" style="justify-content:flex-end">
+      <button class="btn btn-ghost btn-sm" onclick="closeReasonModal()">Cancel</button>
+      <button class="btn btn-danger btn-sm" onclick="submitRejection()">Reject</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+'use strict';
+
+// ── State ──────────────────────────────────────────────────────────────────────
+const API   = '';   // same-origin
+let token   = localStorage.getItem('cg_token') || '';
+let section = 'verifications';
+let currentRejectCtx = null;  // { workerId, doc_type }
+let healthInterval   = null;
+let usersPage        = 1;
+
+// ── API helper ─────────────────────────────────────────────────────────────────
+async function api(method, path, body) {
+  const opts = {
+    method,
+    headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + token },
+  };
+  if (body) opts.body = JSON.stringify(body);
+  const r = await fetch(API + path, opts);
+  const json = await r.json();
+  if (!r.ok) throw new Error(json.error || r.statusText);
+  return json.data;
+}
+
+// ── Toast ──────────────────────────────────────────────────────────────────────
+function toast(msg, type = 'success') {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className   = `show ${type}`;
+  clearTimeout(el._t);
+  el._t = setTimeout(() => { el.className = ''; }, 3000);
+}
+
+// ── Login / logout ─────────────────────────────────────────────────────────────
+async function doLogin() {
+  const btn = document.getElementById('login-btn');
+  const err = document.getElementById('login-err');
+  btn.disabled = true; btn.textContent = 'Signing in…';
+  err.textContent = '';
+  try {
+    const identifier = document.getElementById('login-id').value.trim();
+    const password   = document.getElementById('login-pw').value;
+    const r = await fetch(API + '/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ identifier, password }),
+    });
+    const json = await r.json();
+    if (!r.ok || !json.success) throw new Error(json.error || 'Login failed');
+    if (json.data.user.role !== 'cooperative_admin') throw new Error('Access denied: not an admin account.');
+    token = json.data.token;
+    localStorage.setItem('cg_token', token);
+    document.getElementById('sidebar-name').textContent = json.data.user.name;
+    document.getElementById('login-overlay').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    navigate('verifications');
+  } catch (e) {
+    err.textContent = e.message;
+  } finally {
+    btn.disabled = false; btn.textContent = 'Sign In';
+  }
+}
+
+function doLogout() {
+  token = '';
+  localStorage.removeItem('cg_token');
+  location.reload();
+}
+
+// ── Navigation ─────────────────────────────────────────────────────────────────
+function navigate(s) {
+  section = s;
+  document.querySelectorAll('.nav-item').forEach(el => {
+    el.classList.toggle('active', el.dataset.section === s);
+  });
+  const titles = {
+    verifications: 'Document Verifications',
+    users:         'Users',
+    services:      'Services',
+    grievances:    'Grievances',
+    health:        'System Health',
+    storage:       'File Storage',
+  };
+  document.getElementById('page-title').textContent = titles[s] || s;
+  document.getElementById('topbar-meta').textContent = '';
+  if (healthInterval) { clearInterval(healthInterval); healthInterval = null; }
+  loadSection(s);
+}
+
+function loadSection(s) {
+  setContent('<div class="dots-loader" style="color:var(--text-muted);padding:2rem;">Loading</div>');
+  const loaders = {
+    verifications: loadVerifications,
+    users:         () => loadUsers(1),
+    services:      loadServices,
+    grievances:    loadGrievances,
+    health:        loadHealth,
+    storage:       loadStorage,
+  };
+  if (loaders[s]) loaders[s]();
+}
+
+function setContent(html) {
+  document.getElementById('content').innerHTML = html;
+}
+
+function h(str) {
+  return String(str ?? '').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ── VERIFICATIONS ──────────────────────────────────────────────────────────────
+async function loadVerifications() {
+  try {
+    const workers = await api('GET', '/api/admin/verifications');
+    if (!workers.length) {
+      setContent('<div class="card"><p class="text-muted">🎉 No pending verifications.</p></div>');
+      return;
+    }
+    let html = `<div class="card"><div class="card-title">Pending Document Verifications (${workers.length})</div>`;
+    workers.forEach(w => {
+      html += `
+        <div class="card" style="margin-bottom:1rem;border-left:3px solid var(--warning)">
+          <div class="flex items-center justify-between" style="margin-bottom:.75rem">
+            <div>
+              <strong>${h(w.user_name)}</strong> <span class="text-muted">(${h(w.email)} · ${h(w.mobile)})</span>
+              <div class="text-muted mt-1">Trade: ${h(w.trade_category || '—')} · Reg: ${h(w.cooperative_reg_no || '—')}</div>
+            </div>
+            <span class="badge ${w.is_verified ? 'badge-approved' : 'badge-pending'}">${w.is_verified ? 'Verified' : 'Unverified'}</span>
+          </div>
+          <table>
+            <thead><tr><th>Document</th><th>File</th><th>Status</th><th>Reason</th><th>Actions</th></tr></thead>
+            <tbody>
+              ${docRow(w, 'aadhaar',      'Aadhaar')}
+              ${docRow(w, 'police',       'Police Clearance')}
+              ${docRow(w, 'certificate', 'Trade Certificate')}
+            </tbody>
+          </table>
+        </div>`;
+    });
+    html += '</div>';
+    setContent(html);
+  } catch (e) {
+    setContent(`<div class="alert alert-danger">${h(e.message)}</div>`);
+  }
+}
+
+function docRow(w, key, label) {
+  const status = w[`${key}_status`];
+  const file   = w[`${key}_doc`] || '—';
+  const reason = w[`${key}_rejection_reason`] || '';
+  const actionBtns = status === 'pending'
+    ? `<button class="btn btn-success btn-sm" onclick="verifyDoc(${w.user_id},'${key}','approve')">Approve</button>
+       <button class="btn btn-danger btn-sm" onclick="openRejectModal(${w.user_id},'${key}')">Reject</button>`
+    : `<span class="text-muted">—</span>`;
+  return `<tr>
+    <td>${label}</td>
+    <td class="font-mono">${h(file)}</td>
+    <td><span class="badge badge-${status}">${status}</span></td>
+    <td class="text-muted">${h(reason)}</td>
+    <td><div class="flex gap-2">${actionBtns}</div></td>
+  </tr>`;
+}
+
+function openRejectModal(workerId, doc_type) {
+  currentRejectCtx = { workerId, doc_type };
+  document.getElementById('reason-text').value = '';
+  document.getElementById('reason-modal').classList.remove('hidden');
+}
+function closeReasonModal() {
+  document.getElementById('reason-modal').classList.add('hidden');
+  currentRejectCtx = null;
+}
+async function submitRejection() {
+  const reason = document.getElementById('reason-text').value.trim();
+  if (!reason) { alert('Please enter a reason.'); return; }
+  await verifyDoc(currentRejectCtx.workerId, currentRejectCtx.doc_type, 'reject', reason);
+  closeReasonModal();
+}
+async function verifyDoc(workerId, doc_type, action, reason) {
+  try {
+    await api('PATCH', `/api/admin/verifications/${workerId}`, { doc_type, action, reason: reason || undefined });
+    toast(`Document ${action}d successfully`, 'success');
+    loadVerifications();
+  } catch (e) {
+    toast(e.message, 'error');
+  }
+}
+
+// ── USERS ──────────────────────────────────────────────────────────────────────
+async function loadUsers(page = 1) {
+  usersPage = page;
+  const q    = (document.getElementById('user-search') || {}).value || '';
+  const role = (document.getElementById('user-role-filter') || {}).value || '';
+  try {
+    const data = await api('GET', `/api/admin/users?page=${page}&limit=15${role ? '&role='+encodeURIComponent(role) : ''}${q ? '&q='+encodeURIComponent(q) : ''}`);
+    let html = `
+      <div class="card">
+        <div class="flex items-center justify-between" style="margin-bottom:1rem;flex-wrap:wrap;gap:.75rem">
+          <div class="card-title" style="margin-bottom:0">Users (${data.total})</div>
+          <div class="inline-form">
+            <div class="form-group">
+              <input id="user-search" type="text" placeholder="Search name / email / mobile" style="width:220px" value="${h(q)}" onkeydown="if(event.key==='Enter') loadUsers(1)" />
+            </div>
+            <div class="form-group">
+              <select id="user-role-filter" onchange="loadUsers(1)">
+                <option value="">All roles</option>
+                <option value="customer" ${role==='customer'?'selected':''}>Customer</option>
+                <option value="worker"   ${role==='worker'  ?'selected':''}>Worker</option>
+                <option value="cooperative_admin" ${role==='cooperative_admin'?'selected':''}>Admin</option>
+              </select>
+            </div>
+            <button class="btn btn-primary btn-sm" onclick="loadUsers(1)">Search</button>
+          </div>
+        </div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Name</th><th>Email</th><th>Mobile</th><th>Role</th><th>Verified</th><th>Joined</th></tr></thead>
+            <tbody>`;
+    data.users.forEach(u => {
+      html += `<tr>
+        <td>${u.id}</td>
+        <td>${h(u.name)}</td>
+        <td>${h(u.email)}</td>
+        <td>${h(u.mobile)}</td>
+        <td><span class="badge badge-${u.role === 'cooperative_admin' ? 'admin' : u.role}">${h(u.role)}</span></td>
+        <td><span class="badge ${u.is_verified ? 'badge-approved' : 'badge-pending'}">${u.is_verified ? 'Yes' : 'No'}</span></td>
+        <td class="text-muted">${new Date(u.created_at).toLocaleDateString()}</td>
+      </tr>`;
+    });
+    html += `</tbody></table></div>`;
+    // Pagination
+    if (data.pages > 1) {
+      html += `<div class="pagination">`;
+      for (let p = 1; p <= data.pages; p++) {
+        html += `<button class="page-btn ${p === data.page ? 'active' : ''}" onclick="loadUsers(${p})">${p}</button>`;
+      }
+      html += `</div>`;
+    }
+    html += `</div>`;
+    setContent(html);
+  } catch (e) {
+    setContent(`<div class="alert alert-danger">${h(e.message)}</div>`);
+  }
+}
+
+// ── SERVICES ───────────────────────────────────────────────────────────────────
+let allCategories = [];
+async function loadServices() {
+  try {
+    const [services, cats] = await Promise.all([
+      api('GET', '/api/admin/services'),
+      api('GET', '/api/categories'),
+    ]);
+    allCategories = cats;
+    let catOptions = cats.map(c => `<option value="${c.id}">${h(c.icon)} ${h(c.name)}</option>`).join('');
+    let html = `
+      <div class="card">
+        <div class="card-title">Add New Service</div>
+        <div class="inline-form" id="new-svc-form">
+          <div class="form-group"><label>Category</label><select id="ns-cat">${catOptions}</select></div>
+          <div class="form-group"><label>Title</label><input id="ns-title" type="text" placeholder="Service title" style="width:180px" /></div>
+          <div class="form-group"><label>Price (₹)</label><input id="ns-price" type="number" min="1" style="width:90px" /></div>
+          <div class="form-group"><label>Duration (min)</label><input id="ns-dur" type="number" min="1" value="60" style="width:90px" /></div>
+          <div class="form-group"><label>Worker%</label><input id="ns-wc" type="number" value="85" style="width:70px" /></div>
+          <div class="form-group"><label>Welfare%</label><input id="ns-fc" type="number" value="10" style="width:70px" /></div>
+          <div class="form-group"><label>Platform%</label><input id="ns-pc" type="number" value="5" style="width:70px" /></div>
+          <div class="form-group"><label>&nbsp;</label><button class="btn btn-primary btn-sm" onclick="createService()">Add</button></div>
+        </div>
+        <div id="svc-form-err" class="text-muted mt-2"></div>
+      </div>
+      <div class="card">
+        <div class="card-title">All Services (${services.length})</div>
+        <div class="table-wrap">
+          <table>
+            <thead><tr><th>ID</th><th>Category</th><th>Title</th><th>Price</th><th>Duration</th><th>Cuts (W/F/P)</th><th>Active</th><th>Actions</th></tr></thead>
+            <tbody>`;
+    services.forEach(s => {
+      html += `<tr id="svc-row-${s.id}">
+        <td>${s.id}</td>
+        <td>${h(s.category_icon)} ${h(s.category_name)}</td>
+        <td>${h(s.title)}</td>
+        <td>₹${s.base_price}</td>
+        <td>${s.duration_mins} min</td>
+        <td>${s.worker_cut}% / ${s.welfare_cut}% / ${s.platform_cut}%</td>
+        <td><span class="badge ${s.is_active ? 'badge-approved' : 'badge-rejected'}">${s.is_active ? 'Active' : 'Inactive'}</span></td>
+        <td>
+          <button class="btn btn-ghost btn-sm" onclick="editService(${s.id})">Edit</button>
+          <button class="btn btn-${s.is_active ? 'warning' : 'success'} btn-sm" onclick="toggleService(${s.id}, ${s.is_active})">${s.is_active ? 'Disable' : 'Enable'}</button>
+        </td>
+      </tr>`;
+    });
+    html += `</tbody></table></div></div>`;
+    setContent(html);
+  } catch (e) {
+    setContent(`<div class="alert alert-danger">${h(e.message)}</div>`);
+  }
+}
+
+async function createService() {
+  const errEl = document.getElementById('svc-form-err');
+  errEl.textContent = '';
+  const body = {
+    category_id:   parseInt(document.getElementById('ns-cat').value),
+    title:         document.getElementById('ns-title').value.trim(),
+    base_price:    parseFloat(document.getElementById('ns-price').value),
+    duration_mins: parseInt(document.getElementById('ns-dur').value),
+    worker_cut:    parseFloat(document.getElementById('ns-wc').value),
+    welfare_cut:   parseFloat(document.getElementById('ns-fc').value),
+    platform_cut:  parseFloat(document.getElementById('ns-pc').value),
+  };
+  const total = body.worker_cut + body.welfare_cut + body.platform_cut;
+  if (Math.abs(total - 100) > 0.01) {
+    errEl.textContent = `Cuts must sum to 100% (currently ${total}%).`; return;
+  }
+  try {
+    await api('POST', '/api/admin/services', body);
+    toast('Service created', 'success');
+    loadServices();
+  } catch (e) { errEl.textContent = e.message; }
+}
+
+async function toggleService(id, currentlyActive) {
+  try {
+    await api('PUT', `/api/admin/services/${id}`, { is_active: currentlyActive ? 0 : 1 });
+    toast('Service updated', 'success');
+    loadServices();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+function editService(id) {
+  const row = document.getElementById(`svc-row-${id}`);
+  if (!row) return;
+  // Inline edit: replace row with inputs
+  const cells = row.querySelectorAll('td');
+  const title = cells[2].textContent;
+  const price = cells[3].textContent.replace('₹','');
+  const dur   = cells[4].textContent.replace(' min','');
+  const cuts  = cells[5].textContent.split(' / ').map(c => c.replace('%',''));
+
+  row.innerHTML = `
+    <td>${id}</td>
+    <td>${cells[1].innerHTML}</td>
+    <td><input id="e-title-${id}" value="${h(title)}" style="width:140px;padding:.3rem .5rem;border:1px solid var(--border);border-radius:4px" /></td>
+    <td><input id="e-price-${id}" type="number" value="${price}" style="width:80px;padding:.3rem .5rem;border:1px solid var(--border);border-radius:4px" /></td>
+    <td><input id="e-dur-${id}"   type="number" value="${dur}"   style="width:70px;padding:.3rem .5rem;border:1px solid var(--border);border-radius:4px" /></td>
+    <td>
+      <input id="e-wc-${id}" type="number" value="${cuts[0]}" style="width:50px;padding:.3rem .4rem;border:1px solid var(--border);border-radius:4px" />
+      / <input id="e-fc-${id}" type="number" value="${cuts[1]}" style="width:50px;padding:.3rem .4rem;border:1px solid var(--border);border-radius:4px" />
+      / <input id="e-pc-${id}" type="number" value="${cuts[2]}" style="width:50px;padding:.3rem .4rem;border:1px solid var(--border);border-radius:4px" />
+    </td>
+    <td>${cells[6].innerHTML}</td>
+    <td>
+      <button class="btn btn-success btn-sm" onclick="saveService(${id})">Save</button>
+      <button class="btn btn-ghost btn-sm" onclick="loadServices()">Cancel</button>
+    </td>`;
+}
+
+async function saveService(id) {
+  const wc = parseFloat(document.getElementById(`e-wc-${id}`).value);
+  const fc = parseFloat(document.getElementById(`e-fc-${id}`).value);
+  const pc = parseFloat(document.getElementById(`e-pc-${id}`).value);
+  const total = wc + fc + pc;
+  if (Math.abs(total - 100) > 0.01) {
+    toast(`Cuts must sum to 100% (currently ${total}%)`, 'error'); return;
+  }
+  try {
+    await api('PUT', `/api/admin/services/${id}`, {
+      title:         document.getElementById(`e-title-${id}`).value.trim(),
+      base_price:    parseFloat(document.getElementById(`e-price-${id}`).value),
+      duration_mins: parseInt(document.getElementById(`e-dur-${id}`).value),
+      worker_cut:    wc, welfare_cut: fc, platform_cut: pc,
+    });
+    toast('Service saved', 'success');
+    loadServices();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ── GRIEVANCES ─────────────────────────────────────────────────────────────────
+async function loadGrievances() {
+  const statusFilter = (document.getElementById('griev-status') || {}).value || '';
+  try {
+    const grievances = await api('GET', `/api/admin/grievances${statusFilter ? '?status='+encodeURIComponent(statusFilter) : ''}`);
+    let html = `
+      <div class="card">
+        <div class="flex items-center justify-between" style="margin-bottom:1rem;flex-wrap:wrap;gap:.5rem">
+          <div class="card-title" style="margin-bottom:0">Grievances (${grievances.length})</div>
+          <div class="inline-form">
+            <select id="griev-status" onchange="loadGrievances()">
+              <option value="" ${!statusFilter?'selected':''}>All</option>
+              <option value="open"     ${statusFilter==='open'?'selected':''}>Open</option>
+              <option value="resolved" ${statusFilter==='resolved'?'selected':''}>Resolved</option>
+            </select>
+          </div>
+        </div>`;
+
+    if (!grievances.length) {
+      html += `<p class="text-muted">No grievances found.</p></div>`; setContent(html); return;
+    }
+
+    grievances.forEach(g => {
+      html += `
+        <div class="card" style="margin-bottom:.75rem;border-left:3px solid ${g.status==='open'?'var(--warning)':'var(--success)'}">
+          <div class="flex items-center justify-between">
+            <div>
+              <strong>#${g.id}</strong> — Booking #${g.booking_id}
+              <span class="badge badge-${g.status}" style="margin-left:.5rem">${g.status}</span>
+            </div>
+            <span class="text-muted">${new Date(g.created_at).toLocaleString()}</span>
+          </div>
+          <div class="mt-2 text-sm">Filed by: <strong>${h(g.filed_by_name)}</strong> (${h(g.filed_by_email)})</div>
+          <div class="mt-1 text-sm">Customer: ${h(g.customer_name)} · Worker: ${h(g.worker_name)}</div>
+          <div class="mt-2" style="background:var(--bg-alt);padding:.75rem;border-radius:6px;font-size:.875rem">${h(g.description)}</div>
+          ${g.status === 'open' ? `
+          <div class="mt-2 inline-form">
+            <textarea id="res-${g.id}" placeholder="Resolution note…" style="width:300px;min-height:56px;padding:.5rem .7rem;border:1px solid var(--border);border-radius:6px;font-size:.875rem;resize:vertical"></textarea>
+            <button class="btn btn-success btn-sm" onclick="resolveGrievance(${g.id})">Resolve</button>
+          </div>` : `<div class="mt-2 text-muted text-sm">Resolution: ${h(g.resolution_note || '—')}</div>`}
+        </div>`;
+    });
+    html += `</div>`;
+    setContent(html);
+  } catch (e) {
+    setContent(`<div class="alert alert-danger">${h(e.message)}</div>`);
+  }
+}
+
+async function resolveGrievance(id) {
+  const note = (document.getElementById(`res-${id}`) || {}).value || '';
+  if (note.trim().length < 5) { toast('Resolution note too short (min 5 chars)', 'error'); return; }
+  try {
+    await api('PATCH', `/api/admin/grievances/${id}`, { resolution_note: note.trim() });
+    toast('Grievance resolved', 'success');
+    loadGrievances();
+  } catch (e) { toast(e.message, 'error'); }
+}
+
+// ── HEALTH ─────────────────────────────────────────────────────────────────────
+async function loadHealth() {
+  async function refresh() {
+    try {
+      const d = await api('GET', '/api/admin/health');
+      const el = document.getElementById('health-content');
+      if (!el) return;
+      el.innerHTML = `
+        <div class="stats-grid">
+          <div class="stat-card"><div class="stat-label">Uptime</div><div class="stat-value">${Math.floor(d.uptime/3600)}h ${Math.floor((d.uptime%3600)/60)}m</div></div>
+          <div class="stat-card"><div class="stat-label">Memory</div><div class="stat-value">${d.memoryMB}<span class="stat-unit"> MB</span></div></div>
+          <div class="stat-card"><div class="stat-label">DB Size</div><div class="stat-value">${(d.dbSizeBytes/1024).toFixed(1)}<span class="stat-unit"> KB</span></div></div>
+          <div class="stat-card"><div class="stat-label">DB Latency</div><div class="stat-value">${d.latencyMs}<span class="stat-unit"> ms</span></div></div>
+          <div class="stat-card"><div class="stat-label">Node</div><div class="stat-value" style="font-size:1.1rem">${h(d.nodeVersion)}</div></div>
+        </div>
+        <p class="text-muted">Last refreshed: ${new Date(d.timestamp).toLocaleTimeString()} · Auto-refreshes every 10s</p>`;
+    } catch (e) {
+      const el = document.getElementById('health-content');
+      if (el) el.innerHTML = `<div class="alert alert-danger">${h(e.message)}</div>`;
+    }
+  }
+  setContent(`<div class="card"><div class="card-title">System Health</div><div id="health-content"><div class="dots-loader" style="color:var(--text-muted)">Loading</div></div></div>`);
+  refresh();
+  healthInterval = setInterval(refresh, 10000);
+}
+
+// ── STORAGE ────────────────────────────────────────────────────────────────────
+async function loadStorage() {
+  try {
+    const d = await api('GET', '/api/admin/storage');
+    let html = `
+      <div class="card">
+        <div class="flex items-center justify-between" style="margin-bottom:1rem">
+          <div class="card-title" style="margin-bottom:0">Document Storage</div>
+          <div class="text-muted">
+            ${d.files.length} file${d.files.length!==1?'s':''} ·
+            ${(d.totalSizeBytes/1024).toFixed(1)} KB total ·
+            <strong style="color:${d.orphanCount?'var(--danger)':'var(--success)'}">${d.orphanCount} orphan${d.orphanCount!==1?'s':''}</strong>
+          </div>
+        </div>`;
+    if (!d.files.length) {
+      html += `<p class="text-muted">No documents uploaded yet.</p>`;
+    } else {
+      html += `<div class="table-wrap"><table>
+        <thead><tr><th>Filename</th><th>User ID</th><th>Size</th><th>Status</th></tr></thead>
+        <tbody>`;
+      d.files.forEach(f => {
+        html += `<tr>
+          <td class="font-mono">${h(f.name)}</td>
+          <td>${h(f.userId)}</td>
+          <td>${(f.sizeBytes/1024).toFixed(1)} KB</td>
+          <td><span class="badge ${f.isOrphan ? 'badge-orphan' : 'badge-ok'}">${f.isOrphan ? 'Orphan' : 'OK'}</span></td>
+        </tr>`;
+      });
+      html += `</tbody></table></div>`;
+    }
+    html += `</div>`;
+    setContent(html);
+  } catch (e) {
+    setContent(`<div class="alert alert-danger">${h(e.message)}</div>`);
+  }
+}
+
+// ── Auto-login if token exists ─────────────────────────────────────────────────
+(async function init() {
+  if (!token) return;
+  try {
+    const me = await api('GET', '/api/auth/me');
+    if (me.role !== 'cooperative_admin') throw new Error('not admin');
+    document.getElementById('sidebar-name').textContent = me.name;
+    document.getElementById('login-overlay').classList.add('hidden');
+    document.getElementById('app').classList.remove('hidden');
+    navigate('verifications');
+  } catch (_) {
+    token = '';
+    localStorage.removeItem('cg_token');
+  }
+})();
+
+// Close modal on backdrop click
+document.getElementById('reason-modal').addEventListener('click', function(e) {
+  if (e.target === this) closeReasonModal();
+});
+
+// Enter to login
+document.getElementById('login-pw').addEventListener('keydown', function(e) {
+  if (e.key === 'Enter') doLogin();
+});
+</script>
+</body>
+</html>
