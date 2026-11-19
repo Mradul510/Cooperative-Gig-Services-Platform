@@ -2,7 +2,7 @@ import 'package:intl/intl.dart';
 
 class AppConfig {
   // Using localhost or 10.0.2.2 for Android emulator
-  static String apiBaseUrl = 'http://localhost:3000/api';
+  static String apiBaseUrl = 'http://localhost:2000/api';
   
   static const int connectionTimeoutSeconds = 15;
   static const double maxDispatchRadiusKm = 5.0;

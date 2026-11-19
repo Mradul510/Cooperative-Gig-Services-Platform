@@ -255,6 +255,12 @@ router.patch('/:id/status', requireAuth, (req, res) => {
         db.prepare(`
           UPDATE worker_profiles SET jobs_completed = jobs_completed + 1 WHERE user_id = ?
         `).run(booking.worker_id);
+
+        // Auto-record payment transaction into payments table
+        db.prepare(`
+          INSERT OR IGNORE INTO payments (booking_id, amount, payment_method, payment_status, transaction_id, paid_at)
+          VALUES (?, ?, 'cash', 'completed', ?, datetime('now'))
+        `).run(bookingId, booking.total_amount, `TXN_COOP_${bookingId}_${Date.now()}`);
       }
     });
     txn();
@@ -302,6 +308,12 @@ router.post('/:id/rate', requireAuth, requireRole('customer'), (req, res) => {
       // Update booking rating
       db.prepare('UPDATE bookings SET rating = ?, rating_note = ? WHERE id = ?')
         .run(ratingVal, rating_note || null, bookingId);
+
+      // Record in reviews table
+      db.prepare(`
+        INSERT OR REPLACE INTO reviews (booking_id, customer_id, worker_id, rating, comment)
+        VALUES (?, ?, ?, ?, ?)
+      `).run(bookingId, booking.customer_id, booking.worker_id, ratingVal, rating_note || null);
 
       // Recompute running average for the worker
       const stats = db.prepare(`

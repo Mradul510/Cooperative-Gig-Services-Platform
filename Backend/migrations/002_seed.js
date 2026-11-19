@@ -149,6 +149,44 @@ function runSeed(db) {
     insertCustomer.run(c.name, c.email, c.mobile, hash);
   });
 
+  // ── Worker Skills (Mapping workers to their trade services) ─────────────────
+  const insertWorkerSkill = db.prepare(`
+    INSERT OR IGNORE INTO worker_skills (worker_id, service_id)
+    VALUES (?, ?)
+  `);
+
+  const allWorkers = db.prepare("SELECT id, role FROM users WHERE role = 'worker'").all();
+  allWorkers.forEach((w) => {
+    const prof = db.prepare('SELECT trade_category FROM worker_profiles WHERE user_id = ?').get(w.id);
+    if (prof && prof.trade_category) {
+      const svcs = db.prepare(`
+        SELECT s.id FROM services s
+        JOIN categories c ON c.id = s.category_id
+        WHERE c.name = ?
+      `).all(prof.trade_category);
+      svcs.forEach(s => insertWorkerSkill.run(w.id, s.id));
+    }
+  });
+
+  // ── Sample Reviews & Payments for existing completed bookings ────────────────
+  const insertPayment = db.prepare(`
+    INSERT OR IGNORE INTO payments (booking_id, amount, payment_method, payment_status, transaction_id, paid_at)
+    VALUES (?, ?, ?, 'completed', ?, datetime('now'))
+  `);
+
+  const insertReview = db.prepare(`
+    INSERT OR IGNORE INTO reviews (booking_id, customer_id, worker_id, rating, comment)
+    VALUES (?, ?, ?, ?, ?)
+  `);
+
+  const completedBookings = db.prepare("SELECT * FROM bookings WHERE status = 'completed'").all();
+  completedBookings.forEach((b) => {
+    insertPayment.run(b.id, b.total_amount, 'cash', `TXN_CASH_${b.id}`);
+    if (b.rating) {
+      insertReview.run(b.id, b.customer_id, b.worker_id, b.rating, b.rating_note || 'Great service from verified cooperative worker.');
+    }
+  });
+
   console.log('[seed] Seed data inserted successfully.');
 }
 

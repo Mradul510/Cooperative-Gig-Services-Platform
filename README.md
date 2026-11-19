@@ -153,3 +153,4 @@ flutter run -d chrome    # Or flutter run -d android / ios / windows
 
 ## 📄 License
 Licensed under the [MIT License](LICENSE).
+

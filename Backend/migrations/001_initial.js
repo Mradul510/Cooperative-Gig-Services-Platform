@@ -111,6 +111,37 @@ function runMigrations(db) {
       new_value   TEXT,
       created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
     );
+
+    -- Teammate integration: Payments (tracks split payouts, method, transaction)
+    CREATE TABLE IF NOT EXISTS payments (
+      id             INTEGER PRIMARY KEY AUTOINCREMENT,
+      booking_id     INTEGER UNIQUE NOT NULL REFERENCES bookings(id),
+      amount         REAL NOT NULL,
+      payment_method TEXT NOT NULL DEFAULT 'cash',
+      payment_status TEXT NOT NULL DEFAULT 'pending' CHECK(payment_status IN ('pending', 'completed', 'failed', 'refunded')),
+      transaction_id TEXT UNIQUE,
+      paid_at        DATETIME,
+      created_at     DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- Teammate integration: Reviews (per-booking customer feedback)
+    CREATE TABLE IF NOT EXISTS reviews (
+      id          INTEGER PRIMARY KEY AUTOINCREMENT,
+      booking_id  INTEGER UNIQUE NOT NULL REFERENCES bookings(id),
+      customer_id INTEGER NOT NULL REFERENCES users(id),
+      worker_id   INTEGER NOT NULL REFERENCES users(id),
+      rating      INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),
+      comment     TEXT,
+      created_at  DATETIME DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- Teammate integration: Worker Skills (many-to-many relationship between workers and services)
+    CREATE TABLE IF NOT EXISTS worker_skills (
+      worker_id  INTEGER NOT NULL REFERENCES users(id),
+      service_id INTEGER NOT NULL REFERENCES services(id),
+      created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+      PRIMARY KEY (worker_id, service_id)
+    );
   `);
 
   db.pragma('journal_mode = WAL');

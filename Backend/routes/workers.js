@@ -182,4 +182,25 @@ router.patch('/availability', requireAuth, requireRole('worker'), (req, res) => 
   }
 });
 
+// ── GET /api/workers/:id/reviews ─────────────────────────────────────────────
+
+router.get('/:id/reviews', requireAuth, (req, res) => {
+  try {
+    const db = req.app.locals.db;
+    const workerId = parseInt(req.params.id, 10);
+    const reviews = db.prepare(`
+      SELECT r.*, u.name AS customer_name
+      FROM reviews r
+      JOIN users u ON u.id = r.customer_id
+      WHERE r.worker_id = ?
+      ORDER BY r.created_at DESC
+    `).all(workerId);
+
+    return res.json({ success: true, data: reviews });
+  } catch (err) {
+    console.error('[workers/reviews]', err);
+    return res.status(500).json({ success: false, error: 'Could not fetch worker reviews.' });
+  }
+});
+
 module.exports = router;
