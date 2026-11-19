@@ -37,8 +37,7 @@ class CoopGigApp extends StatelessWidget {
       title: 'CoopGig',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      darkTheme: AppTheme.darkTheme,
-      themeMode: settings.themeMode,
+      themeMode: ThemeMode.light,
       locale: settings.locale,
       supportedLocales: const [
         Locale('en', ''),

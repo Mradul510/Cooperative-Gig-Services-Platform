@@ -21,16 +21,24 @@ class ServiceTile extends StatelessWidget {
 
     // Icon helper according to service title
     Widget getServiceIcon() {
-      if (service.title.toLowerCase().contains('kitchen')) {
-        return const Text('🧽', style: TextStyle(fontSize: 22));
-      } else if (service.title.toLowerCase().contains('deep')) {
-        return const Text('🫧', style: TextStyle(fontSize: 22));
-      } else if (service.title.toLowerCase().contains('fan') || service.title.toLowerCase().contains('switch')) {
-        return const Text('⚡', style: TextStyle(fontSize: 22));
-      } else if (service.title.toLowerCase().contains('tap') || service.title.toLowerCase().contains('pipe')) {
-        return const Text('🔧', style: TextStyle(fontSize: 22));
+      final title = service.title.toLowerCase();
+      IconData iconData = Icons.cleaning_services_rounded;
+      if (title.contains('kitchen')) {
+        iconData = Icons.countertops_rounded;
+      } else if (title.contains('deep')) {
+        iconData = Icons.sanitizer_rounded;
+      } else if (title.contains('fan') || title.contains('switch') || title.contains('wiring') || title.contains('electric')) {
+        iconData = Icons.bolt_rounded;
+      } else if (title.contains('tap') || title.contains('pipe') || title.contains('plumb') || title.contains('leak')) {
+        iconData = Icons.plumbing_rounded;
+      } else if (title.contains('carpenter') || title.contains('door') || title.contains('furnitur') || title.contains('shelf')) {
+        iconData = Icons.handyman_rounded;
       }
-      return const Text('🧹', style: TextStyle(fontSize: 22));
+      return Icon(
+        iconData,
+        size: 24,
+        color: isSelected ? AppColors.forestGreen : const Color(0xFF2C6B56),
+      );
     }
 
     return Container(

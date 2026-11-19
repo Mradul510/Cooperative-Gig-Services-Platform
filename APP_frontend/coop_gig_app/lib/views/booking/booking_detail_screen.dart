@@ -304,9 +304,13 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
                 ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: AppColors.verified),
                   onPressed: () => _handleStatusChange('completed'),
-                  child: const FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text('Mark Job Completed ✓'),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.check_circle_outline, size: 18, color: Colors.white),
+                      SizedBox(width: 6),
+                      Text('Mark Job Completed', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ],
                   ),
                 ),
               ],

@@ -67,8 +67,8 @@
   "errorNetwork": "नेटवर्क त्रुटि। कृपया अपना कनेक्शन जांचें।",
   "errorUnauthorized": "सत्र समाप्त हो गया। कृपया पुनः लॉगिन करें।",
   "loadingText": "लोड हो रहा है...",
-  "emptyWorkers": "आस-पास कोई कर्मी उपलब्ध नहीं 😔",
-  "emptyBookings": "अभी तक कोई बुकिंग नहीं 📋",
+  "emptyWorkers": "आस-पास कोई कर्मी उपलब्ध नहीं",
+  "emptyBookings": "अभी तक कोई बुकिंग नहीं",
   "seeAll": "सभी देखें",
   "retry": "पुनः प्रयास करें",
   "cancel": "रद्द करें",
@@ -88,7 +88,7 @@
     }
   },
   "grievanceDeskTitle": "शिकायत केंद्र",
-  "noGrievances": "अभी तक कोई शिकायत नहीं 🙏",
+  "noGrievances": "अभी तक कोई शिकायत नहीं",
   "pendingDocuments": "लंबित दस्तावेज़",
   "totalEarned": "कुल कमाई",
   "about": "CoopGig के बारे में",
@@ -96,7 +96,7 @@
   "availability": "उपलब्धता",
   "documentUpload": "दस्तावेज़ अपलोड",
   "jobRequests": "काम के अनुरोध",
-  "noJobRequests": "कोई नया काम नहीं 🎉",
+  "noJobRequests": "कोई नया काम नहीं",
   "visitFeeFrom": "{price} से",
   "@visitFeeFrom": {
     "placeholders": { "price": { "type": "String" } }

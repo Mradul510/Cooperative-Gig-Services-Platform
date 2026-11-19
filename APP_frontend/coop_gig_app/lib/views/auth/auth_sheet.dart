@@ -27,6 +27,7 @@ class _AuthSheetState extends State<AuthSheet> {
   final _regMobileController = TextEditingController();
   final _regPasswordController = TextEditingController();
   String _selectedRole = 'customer'; // 'customer' or 'worker'
+  String _selectedTrade = 'Cleaning';
 
   bool _obscurePassword = true;
 
@@ -91,6 +92,7 @@ class _AuthSheetState extends State<AuthSheet> {
       mobile: mobile,
       password: password,
       role: _selectedRole,
+      tradeCategory: _selectedRole == 'worker' ? _selectedTrade : null,
     );
 
     if (!mounted) return;
@@ -373,6 +375,35 @@ class _AuthSheetState extends State<AuthSheet> {
                   ],
                 ),
                 if (_selectedRole == 'worker') ...[
+                  const SizedBox(height: 12),
+                  const Text(
+                    'Select Trade Category',
+                    style: TextStyle(
+                      fontSize: 13,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 6,
+                    children: ['Cleaning', 'Electrical', 'Plumbing', 'Carpentry'].map((trade) {
+                      final isSelected = _selectedTrade == trade;
+                      return ChoiceChip(
+                        label: Text(trade),
+                        selected: isSelected,
+                        selectedColor: AppColors.forestGreen.withValues(alpha: 0.15),
+                        labelStyle: TextStyle(
+                          color: isSelected ? AppColors.forestGreen : null,
+                          fontWeight: isSelected ? FontWeight.w700 : FontWeight.w500,
+                          fontSize: 12,
+                        ),
+                        onSelected: (val) {
+                          if (val) setState(() => _selectedTrade = trade);
+                        },
+                      );
+                    }).toList(),
+                  ),
                   const SizedBox(height: 10),
                   Container(
                     padding: const EdgeInsets.all(10),

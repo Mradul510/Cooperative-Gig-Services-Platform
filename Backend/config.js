@@ -3,7 +3,7 @@
 require('dotenv').config();
 
 const config = {
-  PORT: parseInt(process.env.PORT, 10) || 2000,
+  PORT: parseInt(process.env.PORT, 10) || 3000,
   JWT_SECRET: process.env.JWT_SECRET || 'coop-gig-secret-change-in-prod',
   JWT_EXPIRY: process.env.JWT_EXPIRY || '7d',
   STORAGE_PATH: process.env.STORAGE_PATH || './storage',

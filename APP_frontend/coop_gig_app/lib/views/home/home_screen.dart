@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import '../../models/service.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/worker_controller.dart';
 import '../../controllers/category_controller.dart';
@@ -49,13 +50,13 @@ class _HomeScreenState extends State<HomeScreen> {
     final workerCtrl = Provider.of<WorkerController>(context);
     final user = auth.currentUser;
 
-    // Default trade icons & symbols as in Figma (Cleaning 🧹, Electrical ⚡, Plumbing 🔧, AC Service ❄️)
+    // Trade vector icons matching professional clean UI
     final categoryIcons = {
-      'Cleaning': '🧹',
-      'Electrical': '⚡',
-      'Plumbing': '🔧',
-      'AC Service': '❄️',
-      'Carpentry': '🪚',
+      'Cleaning': Icons.cleaning_services_rounded,
+      'Electrical': Icons.bolt_rounded,
+      'Plumbing': Icons.plumbing_rounded,
+      'AC Service': Icons.ac_unit_rounded,
+      'Carpentry': Icons.handyman_rounded,
     };
 
     return RefreshIndicator(
@@ -138,7 +139,11 @@ class _HomeScreenState extends State<HomeScreen> {
                         const SnackBar(content: Text('Notifications: No pending alerts')),
                       );
                     },
-                    icon: const Text('🔔', style: TextStyle(fontSize: 18)),
+                    icon: Icon(
+                      Icons.notifications_none_rounded,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.forestGreen,
+                      size: 22,
+                    ),
                     padding: EdgeInsets.zero,
                   ),
                 ),
@@ -230,7 +235,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 20),
 
-            // LOCATION SEARCH PILL (Figma exact: 📍 Bhopal Central Co-op |)
+            // LOCATION SEARCH PILL (Figma exact: Bhopal Central Co-op |)
             InkWell(
               onTap: () => _showSocietySwitcher(context),
               borderRadius: BorderRadius.circular(30),
@@ -299,7 +304,7 @@ class _HomeScreenState extends State<HomeScreen> {
             _buildFigmaCategoryRow(context, categoryCtrl, categoryIcons, isDark),
             const SizedBox(height: 24),
 
-            // TRUST STRIP (Figma exact: 🛡️ 100% Verified | ⚖️ Fair Wage Split | 🏥 Welfare Backed)
+            // TRUST STRIP (Figma exact: 100% Verified | Fair Wage Split | Welfare Backed)
             const TrustStrip(),
             const SizedBox(height: 28),
 
@@ -352,29 +357,27 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildFigmaCategoryRow(
     BuildContext context,
     CategoryController categoryCtrl,
-    Map<String, String> categoryIcons,
+    Map<String, IconData> categoryIcons,
     bool isDark,
   ) {
-    // If categories loaded from API, use them; otherwise use standard Figma categories
-    final categories = categoryCtrl.categories.isNotEmpty
-        ? categoryCtrl.categories
-        : [];
+    // If categories loaded from API, use them; otherwise use standard categories
+    final categories = categoryCtrl.categories;
 
     final displayList = [
-      {'name': 'Cleaning', 'emoji': '🧹'},
-      {'name': 'Electrical', 'emoji': '⚡'},
-      {'name': 'Plumbing', 'emoji': '🔧'},
-      {'name': 'AC Service', 'emoji': '❄️'},
+      {'name': 'Cleaning', 'icon': Icons.cleaning_services_rounded, 'id': 1},
+      {'name': 'Electrical', 'icon': Icons.bolt_rounded, 'id': 2},
+      {'name': 'Plumbing', 'icon': Icons.plumbing_rounded, 'id': 3},
+      {'name': 'Carpentry', 'icon': Icons.handyman_rounded, 'id': 4},
     ];
 
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: List.generate(4, (index) {
         final fallback = displayList[index];
-        final name = categories.length > index ? categories[index].name : fallback['name']!;
-        final emoji = categories.length > index
-            ? (categories[index].icon ?? categoryIcons[categories[index].name] ?? fallback['emoji']!)
-            : fallback['emoji']!;
+        final name = categories.length > index ? categories[index].name : fallback['name'] as String;
+        final icon = categories.length > index
+            ? (categoryIcons[categories[index].name] ?? fallback['icon'] as IconData)
+            : fallback['icon'] as IconData;
 
         return Expanded(
           child: Padding(
@@ -384,17 +387,16 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             child: InkWell(
               onTap: () {
-                if (categories.length > index) {
-                  categoryCtrl.selectCategory(categories[index]);
-                  Navigator.of(context).push(
-                    BottomSlideRoute(page: CategoryScreen(category: categories[index])),
-                  );
-                } else if (categories.isNotEmpty) {
-                  categoryCtrl.selectCategory(categories.first);
-                  Navigator.of(context).push(
-                    BottomSlideRoute(page: CategoryScreen(category: categories.first)),
-                  );
-                }
+                final targetCategory = (categories.length > index)
+                    ? categories[index]
+                    : CategoryItem(
+                        id: fallback['id'] as int,
+                        name: fallback['name'] as String,
+                      );
+                categoryCtrl.selectCategory(targetCategory);
+                Navigator.of(context).push(
+                  BottomSlideRoute(page: CategoryScreen(category: targetCategory)),
+                );
               },
               borderRadius: BorderRadius.circular(22),
               child: Column(
@@ -414,9 +416,17 @@ class _HomeScreenState extends State<HomeScreen> {
                       ],
                     ),
                     child: Center(
-                      child: Text(
-                        emoji,
-                        style: const TextStyle(fontSize: 28),
+                      child: Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.forestGreen.withValues(alpha: 0.08),
+                          shape: BoxShape.circle,
+                        ),
+                        child: Icon(
+                          icon,
+                          size: 26,
+                          color: AppColors.forestGreen,
+                        ),
                       ),
                     ),
                   ),

@@ -100,7 +100,7 @@ function dispatchWorkers(db, { lat, lng, radius = 5, category }) {
   const params = [];
 
   if (category) {
-    query += ' AND wp.trade_category = ?';
+    query += ' AND LOWER(wp.trade_category) = LOWER(?)';
     params.push(category);
   }
 

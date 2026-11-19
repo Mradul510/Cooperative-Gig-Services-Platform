@@ -38,7 +38,7 @@ class AppColors {
   static const Color textSecondaryDark = Color(0xFFA2B5AD);
 
   // Functional Accents
-  static const Color coralPin = Color(0xFFDC5B4D); // Terracotta Red Pin 📍
+  static const Color coralPin = Color(0xFFDC5B4D); // Terracotta Red Pin
   static const Color verified = Color(0xFF22483E); // Forest Green
   static const Color pending = Color(0xFFE69A28);  // Warm Gold Bell / Amber
   static const Color error = Color(0xFFE04F43);

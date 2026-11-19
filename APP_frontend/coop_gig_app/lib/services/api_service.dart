@@ -38,18 +38,24 @@ class ApiService {
     required String mobile,
     required String password,
     required String role,
+    String? tradeCategory,
   }) async {
     final url = Uri.parse('${AppConfig.apiBaseUrl}/auth/register');
+    final Map<String, dynamic> body = {
+      'name': name,
+      'email': email,
+      'mobile': mobile,
+      'password': password,
+      'role': role,
+    };
+    if (tradeCategory != null && tradeCategory.isNotEmpty) {
+      body['trade_category'] = tradeCategory;
+    }
+
     final response = await http.post(
       url,
       headers: _headers(),
-      body: jsonEncode({
-        'name': name,
-        'email': email,
-        'mobile': mobile,
-        'password': password,
-        'role': role,
-      }),
+      body: jsonEncode(body),
     ).timeout(const Duration(seconds: AppConfig.connectionTimeoutSeconds));
 
     final data = jsonDecode(response.body);
@@ -183,6 +189,26 @@ class ApiService {
       return;
     } else {
       throw Exception(data['error'] ?? 'Failed to update availability');
+    }
+  }
+
+  Future<void> updateWorkerProfile({String? tradeCategory, int? experienceYears}) async {
+    final url = Uri.parse('${AppConfig.apiBaseUrl}/workers/profile');
+    final Map<String, dynamic> body = {};
+    if (tradeCategory != null) body['trade_category'] = tradeCategory;
+    if (experienceYears != null) body['experience_years'] = experienceYears;
+
+    final response = await http.patch(
+      url,
+      headers: _headers(),
+      body: jsonEncode(body),
+    ).timeout(const Duration(seconds: AppConfig.connectionTimeoutSeconds));
+
+    final data = jsonDecode(response.body);
+    if (response.statusCode >= 200 && response.statusCode < 300 && data['success'] == true) {
+      return;
+    } else {
+      throw Exception(data['error'] ?? 'Failed to update profile');
     }
   }
 

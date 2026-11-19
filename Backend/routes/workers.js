@@ -182,6 +182,54 @@ router.patch('/availability', requireAuth, requireRole('worker'), (req, res) => 
   }
 });
 
+// ── PATCH /api/workers/profile ────────────────────────────────────────────────
+// Update trade category, experience, etc.
+router.patch('/profile', requireAuth, requireRole('worker'), (req, res) => {
+  try {
+    const db = req.app.locals.db;
+    const userId = req.user.id;
+    const { trade_category, experience_years } = req.body;
+
+    const updates = [];
+    const params = [];
+
+    if (trade_category) {
+      updates.push('trade_category = ?');
+      params.push(trade_category);
+    }
+    if (experience_years !== undefined) {
+      updates.push('experience_years = ?');
+      params.push(parseInt(experience_years, 10));
+    }
+
+    if (updates.length === 0) {
+      return res.status(400).json({ success: false, error: 'No fields to update.' });
+    }
+
+    params.push(userId);
+    db.prepare(`UPDATE worker_profiles SET ${updates.join(', ')} WHERE user_id = ?`).run(...params);
+
+    // Also link worker skills if trade changed
+    if (trade_category) {
+      try {
+        const matchingServices = db.prepare(`
+          SELECT s.id FROM services s
+          JOIN categories c ON c.id = s.category_id
+          WHERE LOWER(c.name) = LOWER(?)
+        `).all(trade_category);
+        const insSkill = db.prepare('INSERT OR IGNORE INTO worker_skills (worker_id, service_id) VALUES (?, ?)');
+        matchingServices.forEach(s => insSkill.run(userId, s.id));
+      } catch (_) {}
+    }
+
+    const updated = db.prepare('SELECT * FROM worker_profiles WHERE user_id = ?').get(userId);
+    return res.json({ success: true, data: updated });
+  } catch (err) {
+    console.error('[workers/profile]', err);
+    return res.status(500).json({ success: false, error: 'Could not update worker profile.' });
+  }
+});
+
 // ── GET /api/workers/:id/reviews ─────────────────────────────────────────────
 
 router.get('/:id/reviews', requireAuth, (req, res) => {

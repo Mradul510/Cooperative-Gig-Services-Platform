@@ -31,7 +31,7 @@ class TrustStrip extends StatelessWidget {
           Expanded(
             child: _buildItem(
               context,
-              '🛡️',
+              Icons.verified_user_rounded,
               AppStrings.get(context, 'trust_verified'),
             ),
           ),
@@ -44,7 +44,7 @@ class TrustStrip extends StatelessWidget {
           Expanded(
             child: _buildItem(
               context,
-              '⚖️',
+              Icons.balance_rounded,
               AppStrings.get(context, 'trust_fair_wage'),
             ),
           ),
@@ -57,7 +57,7 @@ class TrustStrip extends StatelessWidget {
           Expanded(
             child: _buildItem(
               context,
-              '🏥',
+              Icons.health_and_safety_rounded,
               AppStrings.get(context, 'trust_welfare'),
             ),
           ),
@@ -68,7 +68,7 @@ class TrustStrip extends StatelessWidget {
 
   Widget _buildItem(
     BuildContext context,
-    String emoji,
+    IconData icon,
     String label,
   ) {
     return Center(
@@ -77,8 +77,8 @@ class TrustStrip extends StatelessWidget {
         child: Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            Text(emoji, style: const TextStyle(fontSize: 13)),
-            const SizedBox(width: 4),
+            Icon(icon, size: 14, color: AppColors.forestGreen),
+            const SizedBox(width: 5),
             Text(
               label,
               maxLines: 1,

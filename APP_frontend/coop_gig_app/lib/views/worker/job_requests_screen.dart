@@ -308,9 +308,13 @@ class _JobRequestsScreenState extends State<JobRequestsScreen> {
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(backgroundColor: AppColors.verified),
                   onPressed: () => _respondToRequest(job.id, 'completed'),
-                  child: const FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: Text('Mark Complete ✓'),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: const [
+                      Icon(Icons.check_circle_outline, size: 16, color: Colors.white),
+                      SizedBox(width: 6),
+                      Text('Mark Complete', style: TextStyle(fontWeight: FontWeight.bold)),
+                    ],
                   ),
                 ),
               ),

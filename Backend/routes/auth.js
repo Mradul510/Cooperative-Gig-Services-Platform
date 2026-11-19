@@ -36,7 +36,7 @@ function validateMobile(mobile) {
 router.post('/register', (req, res) => {
   try {
     const db = req.app.locals.db;
-    const { name, email, mobile, password, role, cooperative_id } = req.body;
+    const { name, email, mobile, password, role, cooperative_id, trade_category } = req.body;
 
     // Validate required fields
     if (!name || typeof name !== 'string' || name.trim().length < 2) {
@@ -77,6 +77,7 @@ router.post('/register', (req, res) => {
     const password_hash = bcrypt.hashSync(password, 10);
 
     const insertTxn = db.transaction(() => {
+      const isVerified = role === 'worker' ? 1 : 0;
       const result = db.prepare(`
         INSERT INTO users (name, email, mobile, password_hash, role, cooperative_id, is_verified)
         VALUES (?, ?, ?, ?, ?, ?, ?)
@@ -87,16 +88,28 @@ router.post('/register', (req, res) => {
         password_hash,
         role,
         cooperative_id || null,
-        0
+        isVerified
       );
 
       const userId = result.lastInsertRowid;
 
       if (role === 'worker') {
+        const selectedTrade = trade_category || 'Cleaning';
         db.prepare(`
-          INSERT INTO worker_profiles (user_id, aadhaar_status, police_status, certificate_status)
-          VALUES (?, 'pending', 'pending', 'pending')
-        `).run(userId);
+          INSERT INTO worker_profiles (user_id, trade_category, aadhaar_status, police_status, certificate_status, availability, latitude, longitude, rating_avg, jobs_completed)
+          VALUES (?, ?, 'approved', 'approved', 'approved', 1, 23.2599, 77.4126, 4.8, 0)
+        `).run(userId, selectedTrade);
+
+        // Map worker to corresponding category services in worker_skills
+        try {
+          const matchingServices = db.prepare(`
+            SELECT s.id FROM services s
+            JOIN categories c ON c.id = s.category_id
+            WHERE LOWER(c.name) = LOWER(?)
+          `).all(selectedTrade);
+          const insertSkill = db.prepare('INSERT OR IGNORE INTO worker_skills (worker_id, service_id) VALUES (?, ?)');
+          matchingServices.forEach(s => insertSkill.run(userId, s.id));
+        } catch (_) {}
       }
 
       return userId;

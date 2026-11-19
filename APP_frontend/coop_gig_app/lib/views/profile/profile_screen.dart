@@ -205,7 +205,7 @@ class ProfileScreen extends StatelessWidget {
             ),
             const SizedBox(height: 16),
 
-            // PREFERENCES (P-1 & P-5)
+            // PREFERENCES (P-5 Language)
             Container(
               decoration: BoxDecoration(
                 color: Theme.of(context).cardTheme.color,
@@ -216,15 +216,35 @@ class ProfileScreen extends StatelessWidget {
               ),
               child: Column(
                 children: [
-                  // P-1: Dark Mode Toggle
-                  SwitchListTile.adaptive(
-                    secondary: const Icon(Icons.dark_mode_outlined, color: AppColors.primaryLight),
-                    title: Text(AppStrings.get(context, 'dark_mode'), style: const TextStyle(fontWeight: FontWeight.w600)),
-                    value: settings.isDarkMode,
-                    activeThumbColor: AppColors.primaryLight,
-                    onChanged: (val) => settings.toggleTheme(val),
-                  ),
-                  const Divider(),
+                  // Worker Trade Category Switcher
+                  if (isWorker) ...[
+                    ListTile(
+                      leading: const Icon(Icons.handyman_outlined, color: AppColors.primaryLight),
+                      title: const Text('Trade Category', style: TextStyle(fontWeight: FontWeight.w600)),
+                      subtitle: Text(
+                        workerProfile?.tradeCategory ?? 'Cleaning',
+                        style: const TextStyle(fontSize: 12, color: AppColors.forestGreen, fontWeight: FontWeight.w600),
+                      ),
+                      trailing: PopupMenuButton<String>(
+                        icon: const Icon(Icons.edit_outlined, size: 20),
+                        tooltip: 'Change Trade Category',
+                        onSelected: (String cat) async {
+                          final success = await auth.updateWorkerTrade(cat);
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(success ? 'Trade category updated to $cat' : 'Failed to update category'),
+                              ),
+                            );
+                          }
+                        },
+                        itemBuilder: (ctx) => ['Cleaning', 'Electrical', 'Plumbing', 'Carpentry']
+                            .map((c) => PopupMenuItem(value: c, child: Text(c)))
+                            .toList(),
+                      ),
+                    ),
+                    const Divider(),
+                  ],
                   // P-5: Language Switch
                   ListTile(
                     leading: const Icon(Icons.language_outlined, color: AppColors.primaryLight),

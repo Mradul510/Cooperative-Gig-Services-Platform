@@ -79,6 +79,7 @@ class AuthController with ChangeNotifier {
     required String mobile,
     required String password,
     required String role,
+    String? tradeCategory,
   }) async {
     _isLoading = true;
     _errorMessage = null;
@@ -91,6 +92,7 @@ class AuthController with ChangeNotifier {
         mobile: mobile,
         password: password,
         role: role,
+        tradeCategory: tradeCategory,
       );
       _token = data['token'];
       _currentUser = User.fromJson(data['user']);
@@ -105,6 +107,18 @@ class AuthController with ChangeNotifier {
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
       _isLoading = false;
+      notifyListeners();
+      return false;
+    }
+  }
+
+  Future<bool> updateWorkerTrade(String newCategory) async {
+    try {
+      await ApiService().updateWorkerProfile(tradeCategory: newCategory);
+      await refreshProfile();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
       notifyListeners();
       return false;
     }
