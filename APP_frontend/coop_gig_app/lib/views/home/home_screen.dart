@@ -48,8 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Widget _buildHomeTab(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final auth = Provider.of<AuthController>(context);
+        final auth = Provider.of<AuthController>(context);
     final categoryCtrl = Provider.of<CategoryController>(context);
     final workerCtrl = Provider.of<WorkerController>(context);
     final bookingCtrl = Provider.of<BookingController>(context);
@@ -110,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: TextStyle(
                           fontSize: 12,
                           fontWeight: FontWeight.w500,
-                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                          color: AppColors.textSecondaryLight,
                         ),
                       ),
                       const SizedBox(height: 1),
@@ -121,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w800,
-                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                          color: AppColors.textPrimaryLight,
                           letterSpacing: -0.2,
                         ),
                       ),
@@ -133,11 +132,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   width: 44,
                   height: 44,
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.surfaceDark : Colors.white,
+                    color: Colors.white,
                     shape: BoxShape.circle,
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                        color: Colors.black.withValues(alpha: 0.04),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -151,7 +150,7 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                     icon: Icon(
                       Icons.notifications_none_rounded,
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.forestGreen,
+                      color: AppColors.forestGreen,
                       size: 22,
                     ),
                     padding: EdgeInsets.zero,
@@ -223,7 +222,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ],
 
             if (isWorker) ...[
-              _buildWorkerHubView(context, auth, user, isDark, categoryIcons),
+              _buildWorkerHubView(context, auth, user, categoryIcons),
             ] else ...[
               // BIG HERO HEADING (Figma exact: "Welcome Home , \nEnjoy Services")
               Text(
@@ -231,7 +230,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   fontSize: 27,
                   fontWeight: FontWeight.w800,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                  color: AppColors.textPrimaryLight,
                   letterSpacing: -0.6,
                   height: 1.15,
                 ),
@@ -241,7 +240,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: TextStyle(
                   fontSize: 27,
                   fontWeight: FontWeight.w800,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                  color: AppColors.textPrimaryLight,
                   letterSpacing: -0.6,
                   height: 1.15,
                 ),
@@ -256,11 +255,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   height: 48,
                   padding: const EdgeInsets.symmetric(horizontal: 16),
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.surfaceDark : Colors.white,
+                    color: Colors.white,
                     borderRadius: BorderRadius.circular(30),
                     boxShadow: [
                       BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                        color: Colors.black.withValues(alpha: 0.03),
                         blurRadius: 8,
                         offset: const Offset(0, 2),
                       ),
@@ -282,7 +281,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           style: TextStyle(
                             fontSize: 14,
                             fontWeight: FontWeight.w600,
-                            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                            color: AppColors.textPrimaryLight,
                           ),
                         ),
                       ),
@@ -308,13 +307,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   fontSize: 18,
                   fontWeight: FontWeight.w800,
                   letterSpacing: -0.3,
-                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                  color: AppColors.textPrimaryLight,
                 ),
               ),
               const SizedBox(height: 16),
 
               // CATEGORY TILES (Figma exact: 4 rounded square white tiles in a row with icons & labels)
-              _buildFigmaCategoryRow(context, categoryCtrl, categoryIcons, isDark),
+              _buildFigmaCategoryRow(context, categoryCtrl, categoryIcons),
               const SizedBox(height: 24),
 
               // TRUST STRIP (Figma exact: 100% Verified | Fair Wage Split | Welfare Backed)
@@ -331,7 +330,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       fontSize: 17,
                       fontWeight: FontWeight.w800,
                       letterSpacing: -0.3,
-                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                      color: AppColors.textPrimaryLight,
                     ),
                   ),
                   TextButton(
@@ -372,8 +371,7 @@ class _HomeScreenState extends State<HomeScreen> {
     BuildContext context,
     CategoryController categoryCtrl,
     Map<String, IconData> categoryIcons,
-    bool isDark,
-  ) {
+      ) {
     // If categories loaded from API, use them; otherwise use standard categories
     final categories = categoryCtrl.categories;
 
@@ -422,11 +420,11 @@ class _HomeScreenState extends State<HomeScreen> {
                   Container(
                     height: 72,
                     decoration: BoxDecoration(
-                      color: isDark ? AppColors.surfaceDark : Colors.white,
+                      color: Colors.white,
                       borderRadius: BorderRadius.circular(22),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                          color: Colors.black.withValues(alpha: 0.04),
                           blurRadius: 10,
                           offset: const Offset(0, 3),
                         ),
@@ -457,7 +455,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: TextStyle(
                         fontSize: 12.5,
                         fontWeight: FontWeight.w600,
-                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                        color: AppColors.textPrimaryLight,
                         letterSpacing: -0.1,
                       ),
                     ),
@@ -532,8 +530,7 @@ class _HomeScreenState extends State<HomeScreen> {
     BuildContext context,
     AuthController auth,
     User? user,
-    bool isDark,
-    Map<String, IconData> categoryIcons,
+        Map<String, IconData> categoryIcons,
   ) {
     final workerProfile = user?.workerProfile;
     final isOnline = workerProfile?.availability ?? true;
@@ -552,7 +549,7 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(
             fontSize: 27,
             fontWeight: FontWeight.w800,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+            color: AppColors.textPrimaryLight,
             letterSpacing: -0.6,
             height: 1.15,
           ),
@@ -562,7 +559,7 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(
             fontSize: 27,
             fontWeight: FontWeight.w800,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+            color: AppColors.textPrimaryLight,
             letterSpacing: -0.6,
             height: 1.15,
           ),
@@ -572,7 +569,7 @@ class _HomeScreenState extends State<HomeScreen> {
           'Bhopal Central Co-op · Hyper-local 5 km Matching',
           style: TextStyle(
             fontSize: 13,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+            color: AppColors.textSecondaryLight,
           ),
         ),
         const SizedBox(height: 18),
@@ -582,8 +579,8 @@ class _HomeScreenState extends State<HomeScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
           decoration: BoxDecoration(
             color: isOnline
-                ? (isDark ? AppColors.surfaceDark : const Color(0xFFF1F8F4))
-                : (isDark ? AppColors.surfaceDark : const Color(0xFFF9F9F9)),
+                ? (const Color(0xFFF1F8F4))
+                : (const Color(0xFFF9F9F9)),
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
               color: isOnline ? AppColors.forestGreen.withValues(alpha: 0.35) : Colors.grey.shade300,
@@ -659,7 +656,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           : 'Turn on duty switch to receive nearby gig dispatches',
                       style: TextStyle(
                         fontSize: 11,
-                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                        color: AppColors.textSecondaryLight,
                       ),
                     ),
                   ],
@@ -695,14 +692,14 @@ class _HomeScreenState extends State<HomeScreen> {
         Container(
           padding: const EdgeInsets.all(16),
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : Colors.white,
+            color: Colors.white,
             borderRadius: BorderRadius.circular(20),
             border: Border.all(
-              color: isDark ? AppColors.borderDark : const Color(0xFFE2EBE5),
+              color: const Color(0xFFE2EBE5),
             ),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                color: Colors.black.withValues(alpha: 0.03),
                 blurRadius: 8,
                 offset: const Offset(0, 2),
               ),
@@ -744,7 +741,7 @@ class _HomeScreenState extends State<HomeScreen> {
                           user?.cooperativeName ?? 'Bhopal Central Co-op · Ward 14',
                           style: TextStyle(
                             fontSize: 12,
-                            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                            color: AppColors.textSecondaryLight,
                           ),
                         ),
                       ],
@@ -763,29 +760,25 @@ class _HomeScreenState extends State<HomeScreen> {
                     iconColor: Colors.amber.shade700,
                     value: '${(workerProfile?.ratingAvg ?? 4.8).toStringAsFixed(1)} ★',
                     label: 'Co-op Rating',
-                    isDark: isDark,
-                  ),
+                                      ),
                   _buildMetricPill(
                     icon: Icons.task_alt_rounded,
                     iconColor: AppColors.forestGreen,
                     value: '${workerProfile?.jobsCompleted ?? 0}',
                     label: 'Jobs Done',
-                    isDark: isDark,
-                  ),
+                                      ),
                   _buildMetricPill(
                     icon: Icons.percent_rounded,
                     iconColor: AppColors.forestGreen,
                     value: '85%',
                     label: 'Take-Home',
-                    isDark: isDark,
-                  ),
+                                      ),
                   _buildMetricPill(
                     icon: Icons.health_and_safety_rounded,
                     iconColor: AppColors.verified,
                     value: 'Active',
                     label: 'Welfare Fund',
-                    isDark: isDark,
-                  ),
+                                      ),
                 ],
               ),
             ],
@@ -804,7 +797,7 @@ class _HomeScreenState extends State<HomeScreen> {
             fontSize: 17,
             fontWeight: FontWeight.w800,
             letterSpacing: -0.3,
-            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+            color: AppColors.textPrimaryLight,
           ),
         ),
         const SizedBox(height: 12),
@@ -820,8 +813,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 badgeText: bookingCtrl.pendingRequests.isNotEmpty
                     ? '${bookingCtrl.pendingRequests.length} New'
                     : null,
-                isDark: isDark,
-                onTap: () {
+                                onTap: () {
                   Navigator.of(context).push(
                     BottomSlideRoute(page: const JobRequestsScreen()),
                   );
@@ -837,8 +829,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icons.account_balance_wallet_outlined,
                 iconColor: AppColors.verified,
                 badgeText: '₹${bookingCtrl.totalWorkerEarnings.toStringAsFixed(0)}',
-                isDark: isDark,
-                onTap: () {
+                                onTap: () {
                   Navigator.of(context).push(
                     BottomSlideRoute(page: const EarningsScreen()),
                   );
@@ -858,8 +849,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 icon: Icons.verified_user_outlined,
                 iconColor: AppColors.forestGreen,
                 badgeText: 'Verified',
-                isDark: isDark,
-                onTap: () {
+                                onTap: () {
                   Navigator.of(context).push(
                     BottomSlideRoute(page: const DocumentUploadScreen()),
                   );
@@ -874,8 +864,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 subtitle: 'Support & SOS desk',
                 icon: Icons.support_agent_rounded,
                 iconColor: AppColors.pending,
-                isDark: isDark,
-                onTap: () {
+                                onTap: () {
                   Navigator.of(context).push(
                     BottomSlideRoute(page: const GrievanceScreen()),
                   );
@@ -896,7 +885,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
                 letterSpacing: -0.3,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                color: AppColors.textPrimaryLight,
               ),
             ),
             Container(
@@ -932,16 +921,16 @@ class _HomeScreenState extends State<HomeScreen> {
         const SizedBox(height: 12),
 
         if (activeGigs.isNotEmpty) ...[
-          ...activeGigs.map((booking) => _buildActiveGigCard(context, booking, isDark)),
+          ...activeGigs.map((booking) => _buildActiveGigCard(context, booking)),
         ] else ...[
           Container(
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
             decoration: BoxDecoration(
-              color: isDark ? AppColors.surfaceDark : Colors.white,
+              color: Colors.white,
               borderRadius: BorderRadius.circular(18),
               border: Border.all(
-                color: isDark ? AppColors.borderDark : const Color(0xFFE2EBE5),
+                color: const Color(0xFFE2EBE5),
               ),
             ),
             child: Column(
@@ -972,7 +961,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   textAlign: TextAlign.center,
                   style: TextStyle(
                     fontSize: 12,
-                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                    color: AppColors.textSecondaryLight,
                     height: 1.4,
                   ),
                 ),
@@ -990,7 +979,6 @@ class _HomeScreenState extends State<HomeScreen> {
     required Color iconColor,
     required String value,
     required String label,
-    required bool isDark,
   }) {
     return Column(
       children: [
@@ -1004,7 +992,7 @@ class _HomeScreenState extends State<HomeScreen> {
               style: TextStyle(
                 fontWeight: FontWeight.w800,
                 fontSize: 13,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                color: AppColors.textPrimaryLight,
               ),
             ),
           ],
@@ -1015,7 +1003,7 @@ class _HomeScreenState extends State<HomeScreen> {
           style: TextStyle(
             fontSize: 10,
             fontWeight: FontWeight.w500,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+            color: AppColors.textSecondaryLight,
           ),
         ),
       ],
@@ -1029,7 +1017,6 @@ class _HomeScreenState extends State<HomeScreen> {
     required IconData icon,
     required Color iconColor,
     String? badgeText,
-    required bool isDark,
     required VoidCallback onTap,
   }) {
     return InkWell(
@@ -1038,14 +1025,14 @@ class _HomeScreenState extends State<HomeScreen> {
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: isDark ? AppColors.surfaceDark : Colors.white,
+          color: Colors.white,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: isDark ? AppColors.borderDark : const Color(0xFFE2EBE5),
+            color: const Color(0xFFE2EBE5),
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+              color: Colors.black.withValues(alpha: 0.03),
               blurRadius: 8,
               offset: const Offset(0, 2),
             ),
@@ -1096,7 +1083,7 @@ class _HomeScreenState extends State<HomeScreen> {
               overflow: TextOverflow.ellipsis,
               style: TextStyle(
                 fontSize: 11,
-                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                color: AppColors.textSecondaryLight,
               ),
             ),
           ],
@@ -1105,7 +1092,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildActiveGigCard(BuildContext context, Booking booking, bool isDark) {
+  Widget _buildActiveGigCard(BuildContext context, Booking booking) {
     final isPending = booking.status == 'pending';
     final statusColor = isPending ? AppColors.pending : AppColors.forestGreen;
 
@@ -1113,10 +1100,10 @@ class _HomeScreenState extends State<HomeScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : Colors.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? AppColors.borderDark : const Color(0xFFE2EBE5),
+          color: const Color(0xFFE2EBE5),
         ),
         boxShadow: [
           BoxShadow(
@@ -1174,7 +1161,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       '${booking.customerName ?? 'Customer'} · ${booking.slotType.toUpperCase()}',
                       style: TextStyle(
                         fontSize: 11,
-                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                        color: AppColors.textSecondaryLight,
                       ),
                     ),
                     Text(
@@ -1271,8 +1258,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final auth = Provider.of<AuthController>(context);
+        final auth = Provider.of<AuthController>(context);
     final isWorker = auth.currentUser?.isWorker ?? false;
 
     final List<Widget> tabs;
@@ -1307,7 +1293,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Container(
       // THE SIGNATURE FIGMA SAGE/CREAM GRADIENT BACKGROUND
       decoration: BoxDecoration(
-        gradient: isDark ? AppColors.darkSageGradient : AppColors.sageGradient,
+        gradient: AppColors.sageGradient,
       ),
       child: Scaffold(
         backgroundColor: Colors.transparent,
@@ -1319,7 +1305,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         bottomNavigationBar: Container(
           decoration: BoxDecoration(
-            color: isDark ? AppColors.surfaceDark : Colors.white,
+            color: Colors.white,
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.04),

@@ -19,15 +19,13 @@ class FeeBreakdownCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(12),
         border: Border.all(
-          color: isDark ? AppColors.borderDark : AppColors.borderLight,
+          color: AppColors.borderLight,
         ),
       ),
       child: Column(
@@ -70,7 +68,7 @@ class FeeBreakdownCard extends StatelessWidget {
             label: '${AppStrings.get(context, 'platform_fee')} (5%)',
             subLabel: 'Server hosting & dispatch maintenance',
             amount: platformPayout,
-            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+            color: AppColors.textSecondaryLight,
           ),
           const Divider(height: 24),
           Row(
@@ -111,8 +109,6 @@ class FeeBreakdownCard extends StatelessWidget {
     required double amount,
     required Color color,
   }) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     return Row(
       crossAxisAlignment: CrossAxisAlignment.center,
       children: [
@@ -138,9 +134,9 @@ class FeeBreakdownCard extends StatelessWidget {
               ),
               Text(
                 subLabel,
-                style: TextStyle(
+                style: const TextStyle(
                   fontSize: 11,
-                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                  color: AppColors.textSecondaryLight,
                 ),
               ),
             ],

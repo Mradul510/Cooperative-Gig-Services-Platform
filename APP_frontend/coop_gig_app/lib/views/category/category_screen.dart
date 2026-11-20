@@ -87,8 +87,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-    final categoryCtrl = Provider.of<CategoryController>(context);
+        final categoryCtrl = Provider.of<CategoryController>(context);
     final workerCtrl = Provider.of<WorkerController>(context);
     final auth = Provider.of<AuthController>(context);
     final user = auth.currentUser;
@@ -118,7 +117,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
       },
       child: Container(
         decoration: BoxDecoration(
-          gradient: isDark ? AppColors.darkSageGradient : AppColors.sageGradient,
+          gradient: AppColors.sageGradient,
         ),
         child: Scaffold(
           backgroundColor: Colors.transparent,
@@ -133,7 +132,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   width: 42,
                   height: 42,
                   child: Material(
-                    color: isDark ? AppColors.surfaceDark : Colors.white,
+                    color: Colors.white,
                     shape: const CircleBorder(),
                     elevation: 2,
                     shadowColor: Colors.black12,
@@ -144,7 +143,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         child: Icon(
                           Icons.arrow_back_rounded,
                           size: 22,
-                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                          color: AppColors.textPrimaryLight,
                         ),
                       ),
                     ),
@@ -157,7 +156,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                color: AppColors.textPrimaryLight,
               ),
             ),
           actions: [
@@ -167,11 +166,11 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 width: 40,
                 height: 40,
                 decoration: BoxDecoration(
-                  color: isDark ? AppColors.surfaceDark : Colors.white,
+                  color: Colors.white,
                   shape: BoxShape.circle,
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
+                      color: Colors.black.withValues(alpha: 0.04),
                       blurRadius: 8,
                       offset: const Offset(0, 2),
                     ),
@@ -181,7 +180,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   icon: Icon(
                     Icons.tune_rounded,
                     size: 20,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.forestGreen,
+                    color: AppColors.forestGreen,
                   ),
                   onPressed: () {
                     showModalBottomSheet(
@@ -225,7 +224,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             style: TextStyle(
                               fontSize: 13,
                               fontWeight: FontWeight.w700,
-                              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                              color: AppColors.textPrimaryLight,
                             ),
                           ),
                         ),
@@ -243,7 +242,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             fontSize: 17,
                             fontWeight: FontWeight.w800,
                             letterSpacing: -0.3,
-                            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                            color: AppColors.textPrimaryLight,
                           ),
                         ),
                         Text(
@@ -251,7 +250,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                           style: TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                            color: AppColors.textSecondaryLight,
                           ),
                         ),
                       ],
@@ -285,7 +284,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             fontSize: 17,
                             fontWeight: FontWeight.w800,
                             letterSpacing: -0.3,
-                            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                            color: AppColors.textPrimaryLight,
                           ),
                         ),
                         Text(
@@ -312,10 +311,10 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
                         decoration: BoxDecoration(
-                          color: isDark ? AppColors.surfaceDark : Colors.white,
+                          color: Colors.white,
                           borderRadius: BorderRadius.circular(18),
                           border: Border.all(
-                            color: isDark ? AppColors.borderDark : const Color(0xFFE2EBE5),
+                            color: const Color(0xFFE2EBE5),
                           ),
                         ),
                         child: Column(
@@ -327,7 +326,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               style: TextStyle(
                                 fontSize: 14,
                                 fontWeight: FontWeight.w700,
-                                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                                color: AppColors.textPrimaryLight,
                               ),
                             ),
                             const SizedBox(height: 4),
@@ -336,7 +335,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                               textAlign: TextAlign.center,
                               style: TextStyle(
                                 fontSize: 12,
-                                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                                color: AppColors.textSecondaryLight,
                               ),
                             ),
                           ],
@@ -349,7 +348,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         itemCount: categoryWorkers.length,
                         itemBuilder: (context, index) {
                           final worker = categoryWorkers[index];
-                          return _buildCategoryWorkerCard(context, worker, selectedService, isDark);
+                          return _buildCategoryWorkerCard(context, worker, selectedService);
                         },
                       ),
                     ],
@@ -367,7 +366,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
               decoration: BoxDecoration(
-                color: isDark ? AppColors.surfaceDark : Colors.white,
+                color: Colors.white,
                 boxShadow: [
                   BoxShadow(
                     color: Colors.black.withValues(alpha: 0.05),
@@ -391,7 +390,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                             style: TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
-                              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                              color: AppColors.textSecondaryLight,
                             ),
                           ),
                           Row(
@@ -405,7 +404,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                 style: TextStyle(
                                   fontSize: 24,
                                   fontWeight: FontWeight.w800,
-                                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                                  color: AppColors.textPrimaryLight,
                                   letterSpacing: -0.5,
                                 ),
                               ),
@@ -415,7 +414,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                 style: TextStyle(
                                   fontSize: 12,
                                   fontWeight: FontWeight.w500,
-                                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                                  color: AppColors.textSecondaryLight,
                                 ),
                               ),
                             ],
@@ -475,8 +474,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
     BuildContext context,
     WorkerFeedItem worker,
     ServiceItem? selectedService,
-    bool isDark,
-  ) {
+      ) {
     final effectiveService = selectedService ??
         ServiceItem(
           id: 1,
@@ -489,14 +487,14 @@ class _CategoryScreenState extends State<CategoryScreen> {
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
-        color: isDark ? AppColors.surfaceDark : Colors.white,
+        color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(
-          color: isDark ? AppColors.borderDark : const Color(0xFFE2EBE5),
+          color: const Color(0xFFE2EBE5),
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -535,7 +533,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                         style: TextStyle(
                           fontSize: 15,
                           fontWeight: FontWeight.w700,
-                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                          color: AppColors.textPrimaryLight,
                         ),
                       ),
                     ),
@@ -553,7 +551,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       style: TextStyle(
                         fontSize: 12,
                         fontWeight: FontWeight.w700,
-                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                        color: AppColors.textPrimaryLight,
                       ),
                     ),
                     const SizedBox(width: 6),
@@ -561,7 +559,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       '· ${worker.jobsCompleted} jobs',
                       style: TextStyle(
                         fontSize: 12,
-                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                        color: AppColors.textSecondaryLight,
                       ),
                     ),
                     const SizedBox(width: 6),

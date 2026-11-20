@@ -71,7 +71,6 @@ class _WorkerListScreenState extends State<WorkerListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final workerCtrl = Provider.of<WorkerController>(context);
 
     void navigateBack() {
@@ -94,8 +93,8 @@ class _WorkerListScreenState extends State<WorkerListScreen> {
         navigateBack();
       },
       child: Container(
-        decoration: BoxDecoration(
-          gradient: isDark ? AppColors.darkSageGradient : AppColors.sageGradient,
+        decoration: const BoxDecoration(
+          gradient: AppColors.sageGradient,
         ),
         child: Scaffold(
           backgroundColor: Colors.transparent,
@@ -110,18 +109,18 @@ class _WorkerListScreenState extends State<WorkerListScreen> {
                   width: 42,
                   height: 42,
                   child: Material(
-                    color: isDark ? AppColors.surfaceDark : Colors.white,
+                    color: Colors.white,
                     shape: const CircleBorder(),
                     elevation: 2,
                     shadowColor: Colors.black12,
                     child: InkWell(
                       customBorder: const CircleBorder(),
                       onTap: navigateBack,
-                      child: Center(
+                      child: const Center(
                         child: Icon(
                           Icons.arrow_back_rounded,
                           size: 22,
-                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                          color: AppColors.textPrimaryLight,
                         ),
                       ),
                     ),
@@ -153,7 +152,7 @@ class _WorkerListScreenState extends State<WorkerListScreen> {
                   separatorBuilder: (_, _) => const SizedBox(height: 12),
                   itemBuilder: (context, index) {
                     final worker = workerCtrl.workers[index];
-                    return _buildWorkerCard(context, worker, isDark);
+                    return _buildWorkerCard(context, worker);
                   },
                 ),
         ),
@@ -161,7 +160,7 @@ class _WorkerListScreenState extends State<WorkerListScreen> {
     );
   }
 
-  Widget _buildWorkerCard(BuildContext context, WorkerFeedItem worker, bool isDark) {
+  Widget _buildWorkerCard(BuildContext context, WorkerFeedItem worker) {
     final gradient = TradeAssets.getAvatarGradient(worker.userId);
 
     return Container(
@@ -169,11 +168,11 @@ class _WorkerListScreenState extends State<WorkerListScreen> {
         color: Theme.of(context).cardTheme.color,
         borderRadius: BorderRadius.circular(16),
         border: Border.all(
-          color: isDark ? AppColors.borderDark : AppColors.borderLight,
+          color: AppColors.borderLight,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.04),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 10,
             offset: const Offset(0, 3),
           ),
@@ -270,10 +269,10 @@ class _WorkerListScreenState extends State<WorkerListScreen> {
                           '${worker.tradeCategory ?? "Tradesperson"} · ${worker.cooperativeRegNo ?? "BCK-COOP"}',
                           maxLines: 1,
                           overflow: TextOverflow.ellipsis,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 12,
                             fontWeight: FontWeight.w500,
-                            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                            color: AppColors.textSecondaryLight,
                           ),
                         ),
                         const SizedBox(height: 4),
@@ -291,9 +290,9 @@ class _WorkerListScreenState extends State<WorkerListScreen> {
                                 '${worker.jobsCompleted} ${AppStrings.get(context, 'jobs_done')}',
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
+                                style: const TextStyle(
                                   fontSize: 12,
-                                  color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                                  color: AppColors.textSecondaryLight,
                                 ),
                               ),
                             ),
@@ -320,9 +319,9 @@ class _WorkerListScreenState extends State<WorkerListScreen> {
                       ),
                       Text(
                         'Visit fee',
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 11,
-                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                          color: AppColors.textSecondaryLight,
                         ),
                       ),
                     ],

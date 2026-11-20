@@ -17,8 +17,6 @@ class ServiceTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
-
     // Icon helper according to service title
     Widget getServiceIcon() {
       final title = service.title.toLowerCase();
@@ -45,18 +43,18 @@ class ServiceTile extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: isSelected
-            ? (isDark ? AppColors.forestGreenDark : AppColors.forestGreenLight)
-            : (isDark ? AppColors.surfaceDark : Colors.white),
+            ? AppColors.forestGreenLight
+            : Colors.white,
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
           color: isSelected
               ? AppColors.forestGreen
-              : (isDark ? AppColors.borderDark : const Color(0xFFE2EBE5)),
+              : const Color(0xFFE2EBE5),
           width: isSelected ? 1.6 : 1.0,
         ),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+            color: Colors.black.withValues(alpha: 0.03),
             blurRadius: 8,
             offset: const Offset(0, 2),
           ),
@@ -76,7 +74,7 @@ class ServiceTile extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: isSelected
                       ? Colors.white.withValues(alpha: 0.8)
-                      : (isDark ? AppColors.bgDarkTop : const Color(0xFFEFF5F0)),
+                      : const Color(0xFFEFF5F0),
                   borderRadius: BorderRadius.circular(14),
                 ),
                 child: Center(child: getServiceIcon()),
@@ -92,10 +90,10 @@ class ServiceTile extends StatelessWidget {
                       service.title,
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
-                      style: TextStyle(
+                      style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.w700,
-                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                        color: AppColors.textPrimaryLight,
                         letterSpacing: -0.2,
                       ),
                     ),
@@ -105,9 +103,9 @@ class ServiceTile extends StatelessWidget {
                         service.description!,
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 12,
-                          color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                          color: AppColors.textSecondaryLight,
                         ),
                       ),
                     ],
@@ -116,10 +114,10 @@ class ServiceTile extends StatelessWidget {
                       children: [
                         Text(
                           AppConfig.formatINRWhole(service.basePrice),
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 15,
                             fontWeight: FontWeight.w800,
-                            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                            color: AppColors.textPrimaryLight,
                           ),
                         ),
                         const SizedBox(width: 6),
@@ -128,10 +126,10 @@ class ServiceTile extends StatelessWidget {
                             '· ${service.durationMins ~/ 60 > 0 ? "${service.durationMins ~/ 60}-${(service.durationMins ~/ 60) + 1} hours" : "${service.durationMins} mins"}',
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 12,
                               fontWeight: FontWeight.w500,
-                              color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                              color: AppColors.textSecondaryLight,
                             ),
                           ),
                         ),
@@ -151,7 +149,7 @@ class ServiceTile extends StatelessWidget {
                   border: Border.all(
                     color: isSelected
                         ? AppColors.forestGreen
-                        : (isDark ? Colors.grey.shade600 : Colors.grey.shade400),
+                        : Colors.grey.shade400,
                     width: 1.5,
                   ),
                 ),

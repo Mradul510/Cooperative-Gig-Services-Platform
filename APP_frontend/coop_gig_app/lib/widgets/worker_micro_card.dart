@@ -17,7 +17,6 @@ class WorkerMicroCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final gradient = TradeAssets.getAvatarGradient(worker.userId);
 
     return InkWell(
@@ -30,11 +29,11 @@ class WorkerMicroCard extends StatelessWidget {
           color: Theme.of(context).cardTheme.color,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isDark ? AppColors.borderDark : AppColors.borderLight,
+            color: AppColors.borderLight,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: isDark ? 0.25 : 0.04),
+              color: Colors.black.withValues(alpha: 0.04),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -145,10 +144,10 @@ class WorkerMicroCard extends StatelessWidget {
                   worker.tradeCategory ?? 'Cooperative Pro',
                   maxLines: 1,
                   overflow: TextOverflow.ellipsis,
-                  style: TextStyle(
+                  style: const TextStyle(
                     fontSize: 12,
                     fontWeight: FontWeight.w500,
-                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                    color: AppColors.textSecondaryLight,
                   ),
                 ),
               ],
@@ -185,9 +184,9 @@ class WorkerMicroCard extends StatelessWidget {
                     '${worker.jobsCompleted}+ jobs',
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 11,
-                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                      color: AppColors.textSecondaryLight,
                     ),
                   ),
                 ),
@@ -204,9 +203,9 @@ class WorkerMicroCard extends StatelessWidget {
                     AppStrings.get(context, 'onwards'),
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
+                    style: const TextStyle(
                       fontSize: 11,
-                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                      color: AppColors.textSecondaryLight,
                     ),
                   ),
                 ),

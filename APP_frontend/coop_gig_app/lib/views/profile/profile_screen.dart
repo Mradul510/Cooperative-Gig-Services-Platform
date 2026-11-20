@@ -17,7 +17,6 @@ class ProfileScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final auth = Provider.of<AuthController>(context);
     final settings = Provider.of<SettingsProvider>(context);
     final user = auth.currentUser;
@@ -41,7 +40,7 @@ class ProfileScreen extends StatelessWidget {
                 color: Theme.of(context).cardTheme.color,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                  color: AppColors.borderLight,
                 ),
               ),
               child: Column(
@@ -73,7 +72,7 @@ class ProfileScreen extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
                       fontSize: 12,
-                      color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                      color: AppColors.textSecondaryLight,
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -122,7 +121,7 @@ class ProfileScreen extends StatelessWidget {
                   color: Theme.of(context).cardTheme.color,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                    color: AppColors.borderLight,
                   ),
                 ),
                 child: ListTile(
@@ -149,7 +148,7 @@ class ProfileScreen extends StatelessWidget {
                   color: Theme.of(context).cardTheme.color,
                   borderRadius: BorderRadius.circular(12),
                   border: Border.all(
-                    color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                    color: AppColors.borderLight,
                   ),
                 ),
                 child: ListTile(
@@ -173,7 +172,7 @@ class ProfileScreen extends StatelessWidget {
                 color: Theme.of(context).cardTheme.color,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                  color: AppColors.borderLight,
                 ),
               ),
               child: Column(
@@ -211,7 +210,7 @@ class ProfileScreen extends StatelessWidget {
                 color: Theme.of(context).cardTheme.color,
                 borderRadius: BorderRadius.circular(12),
                 border: Border.all(
-                  color: isDark ? AppColors.borderDark : AppColors.borderLight,
+                  color: AppColors.borderLight,
                 ),
               ),
               child: Column(
