@@ -16,9 +16,12 @@ import '../category/category_screen.dart';
 import '../category/worker_list_screen.dart';
 import '../profile/profile_screen.dart';
 import '../profile/booking_history_screen.dart';
+import '../profile/grievance_screen.dart';
+import '../booking/booking_detail_screen.dart';
 import '../worker/job_requests_screen.dart';
 import '../worker/earnings_screen.dart';
 import '../worker/document_upload_screen.dart';
+import '../../models/booking.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -49,6 +52,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final auth = Provider.of<AuthController>(context);
     final categoryCtrl = Provider.of<CategoryController>(context);
     final workerCtrl = Provider.of<WorkerController>(context);
+    final bookingCtrl = Provider.of<BookingController>(context);
     final user = auth.currentUser;
     final isWorker = user?.isWorker ?? false;
 
@@ -65,6 +69,10 @@ class _HomeScreenState extends State<HomeScreen> {
       onRefresh: () async {
         await categoryCtrl.fetchCategories();
         await workerCtrl.fetchWorkers();
+        await bookingCtrl.fetchBookings();
+        if (isWorker) {
+          await auth.refreshProfile();
+        }
       },
       child: SingleChildScrollView(
         physics: const AlwaysScrollableScrollPhysics(),
@@ -214,104 +222,106 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ],
 
-            // BIG HERO HEADING (Figma exact: "Welcome Home , \nEnjoy Services")
-            Text(
-              'Welcome Home ,',
-              style: TextStyle(
-                fontSize: 27,
-                fontWeight: FontWeight.w800,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-                letterSpacing: -0.6,
-                height: 1.15,
-              ),
-            ),
-            Text(
-              'Enjoy Services',
-              style: TextStyle(
-                fontSize: 27,
-                fontWeight: FontWeight.w800,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-                letterSpacing: -0.6,
-                height: 1.15,
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // LOCATION SEARCH PILL (Figma exact: Bhopal Central Co-op |)
-            InkWell(
-              onTap: () => _showSocietySwitcher(context),
-              borderRadius: BorderRadius.circular(30),
-              child: Container(
-                height: 48,
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: isDark ? AppColors.surfaceDark : Colors.white,
-                  borderRadius: BorderRadius.circular(30),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
-                    ),
-                  ],
+            if (isWorker) ...[
+              _buildWorkerHubView(context, auth, user, isDark, categoryIcons),
+            ] else ...[
+              // BIG HERO HEADING (Figma exact: "Welcome Home , \nEnjoy Services")
+              Text(
+                'Welcome Home ,',
+                style: TextStyle(
+                  fontSize: 27,
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                  letterSpacing: -0.6,
+                  height: 1.15,
                 ),
-                child: Row(
-                  children: [
-                    const Icon(
-                      Icons.location_on,
-                      size: 18,
-                      color: AppColors.coralPin, // Terracotta red pin
-                    ),
-                    const SizedBox(width: 8),
-                    Expanded(
-                      child: Text(
-                        user?.cooperativeName ?? 'Bhopal Central Co-op',
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                        style: TextStyle(
-                          fontSize: 14,
-                          fontWeight: FontWeight.w600,
-                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+              ),
+              Text(
+                'Enjoy Services',
+                style: TextStyle(
+                  fontSize: 27,
+                  fontWeight: FontWeight.w800,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                  letterSpacing: -0.6,
+                  height: 1.15,
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              // LOCATION SEARCH PILL (Figma exact: Bhopal Central Co-op |)
+              InkWell(
+                onTap: () => _showSocietySwitcher(context),
+                borderRadius: BorderRadius.circular(30),
+                child: Container(
+                  height: 48,
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.surfaceDark : Colors.white,
+                    borderRadius: BorderRadius.circular(30),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on,
+                        size: 18,
+                        color: AppColors.coralPin, // Terracotta red pin
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          user?.cooperativeName ?? 'Bhopal Central Co-op',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: TextStyle(
+                            fontSize: 14,
+                            fontWeight: FontWeight.w600,
+                            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                          ),
                         ),
                       ),
-                    ),
-                    const SizedBox(width: 4),
-                    Text(
-                      '|',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w300,
-                        color: Colors.grey.shade400,
+                      const SizedBox(width: 4),
+                      Text(
+                        '|',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w300,
+                          color: Colors.grey.shade400,
+                        ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-            const SizedBox(height: 26),
+              const SizedBox(height: 26),
 
-            // CATEGORY HEADER (Figma exact)
-            Text(
-              'Category',
-              style: TextStyle(
-                fontSize: 18,
-                fontWeight: FontWeight.w800,
-                letterSpacing: -0.3,
-                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+              // CATEGORY HEADER (Figma exact)
+              Text(
+                'Category',
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.w800,
+                  letterSpacing: -0.3,
+                  color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                ),
               ),
-            ),
-            const SizedBox(height: 16),
+              const SizedBox(height: 16),
 
-            // CATEGORY TILES (Figma exact: 4 rounded square white tiles in a row with icons & labels)
-            _buildFigmaCategoryRow(context, categoryCtrl, categoryIcons, isDark),
-            const SizedBox(height: 24),
+              // CATEGORY TILES (Figma exact: 4 rounded square white tiles in a row with icons & labels)
+              _buildFigmaCategoryRow(context, categoryCtrl, categoryIcons, isDark),
+              const SizedBox(height: 24),
 
-            // TRUST STRIP (Figma exact: 100% Verified | Fair Wage Split | Welfare Backed)
-            const TrustStrip(),
-            const SizedBox(height: 28),
+              // TRUST STRIP (Figma exact: 100% Verified | Fair Wage Split | Welfare Backed)
+              const TrustStrip(),
+              const SizedBox(height: 28),
 
-            // AVAILABLE WORKERS (5 KM) - ONLY SHOWN FOR CUSTOMERS (HIDDEN FOR WORKERS)
-            if (!isWorker) ...[
+              // AVAILABLE WORKERS (5 KM) - ONLY SHOWN FOR CUSTOMERS
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -350,10 +360,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 height: 215,
                 child: _buildWorkerFeed(context, workerCtrl),
               ),
-              const SizedBox(height: 24),
-            ] else ...[
-              // WORKER DASHBOARD (GIGS, EARNINGS & CONTROLS INSTEAD OF AVAILABLE WORKERS)
-              _buildWorkerDashboardSection(context, user, isDark),
               const SizedBox(height: 24),
             ],
           ],
@@ -522,18 +528,370 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildWorkerDashboardSection(BuildContext context, User? user, bool isDark) {
+  Widget _buildWorkerHubView(
+    BuildContext context,
+    AuthController auth,
+    User? user,
+    bool isDark,
+    Map<String, IconData> categoryIcons,
+  ) {
     final workerProfile = user?.workerProfile;
-    final trade = workerProfile?.tradeCategory ?? 'Home Services';
+    final isOnline = workerProfile?.availability ?? true;
+    final trade = workerProfile?.tradeCategory ?? 'Cleaning';
+    final bookingCtrl = Provider.of<BookingController>(context);
+    final activeGigs = bookingCtrl.bookings
+        .where((b) => b.status == 'pending' || b.status == 'accepted')
+        .toList();
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
+        // HERO HEADING (Worker Partner Hub)
+        Text(
+          'Worker Partner Hub ,',
+          style: TextStyle(
+            fontSize: 27,
+            fontWeight: FontWeight.w800,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+            letterSpacing: -0.6,
+            height: 1.15,
+          ),
+        ),
+        Text(
+          'Duty & Dispatch Desk',
+          style: TextStyle(
+            fontSize: 27,
+            fontWeight: FontWeight.w800,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+            letterSpacing: -0.6,
+            height: 1.15,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          'Bhopal Central Co-op · Hyper-local 5 km Matching',
+          style: TextStyle(
+            fontSize: 13,
+            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+          ),
+        ),
+        const SizedBox(height: 18),
+
+        // 1. LIVE DUTY / ONLINE AVAILABILITY SWITCH CARD
+        Container(
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+          decoration: BoxDecoration(
+            color: isOnline
+                ? (isDark ? AppColors.surfaceDark : const Color(0xFFF1F8F4))
+                : (isDark ? AppColors.surfaceDark : const Color(0xFFF9F9F9)),
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isOnline ? AppColors.forestGreen.withValues(alpha: 0.35) : Colors.grey.shade300,
+              width: 1.5,
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: isOnline
+                    ? AppColors.forestGreen.withValues(alpha: 0.08)
+                    : Colors.black.withValues(alpha: 0.02),
+                blurRadius: 10,
+                offset: const Offset(0, 3),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: isOnline ? AppColors.forestGreen : Colors.grey.shade400,
+                  boxShadow: isOnline
+                      ? [
+                          BoxShadow(
+                            color: AppColors.forestGreen.withValues(alpha: 0.5),
+                            blurRadius: 6,
+                            spreadRadius: 2,
+                          ),
+                        ]
+                      : null,
+                ),
+              ),
+              const SizedBox(width: 12),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      children: [
+                        Text(
+                          isOnline ? 'DUTY ONLINE' : 'DUTY OFFLINE',
+                          style: TextStyle(
+                            fontWeight: FontWeight.w800,
+                            fontSize: 13,
+                            letterSpacing: 0.5,
+                            color: isOnline ? AppColors.forestGreen : Colors.grey.shade700,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: (isOnline ? AppColors.forestGreen : Colors.grey).withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(6),
+                          ),
+                          child: Text(
+                            isOnline ? '5 km Active' : 'Paused',
+                            style: TextStyle(
+                              fontSize: 10,
+                              fontWeight: FontWeight.w700,
+                              color: isOnline ? AppColors.forestGreen : Colors.grey.shade700,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 3),
+                    Text(
+                      isOnline
+                          ? 'Visible to nearby customers in Bhopal Central Co-op'
+                          : 'Turn on duty switch to receive nearby gig dispatches',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Switch(
+                value: isOnline,
+                activeThumbColor: AppColors.forestGreen,
+                activeTrackColor: AppColors.forestGreen.withValues(alpha: 0.5),
+                onChanged: (val) async {
+                  await auth.toggleAvailability(val);
+                  if (context.mounted) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text(
+                          val
+                              ? 'Duty Status: You are now ONLINE & receiving gigs!'
+                              : 'Duty Status: You are now OFFLINE (Duty paused).',
+                        ),
+                        backgroundColor: val ? AppColors.forestGreen : Colors.grey.shade800,
+                        duration: const Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 18),
+
+        // 2. WORKER TRADE & CREDENTIALS CARD
+        Container(
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: isDark ? AppColors.surfaceDark : Colors.white,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(
+              color: isDark ? AppColors.borderDark : const Color(0xFFE2EBE5),
+            ),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                blurRadius: 8,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Column(
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(10),
+                    decoration: BoxDecoration(
+                      color: AppColors.forestGreen.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Icon(
+                      categoryIcons[trade] ?? Icons.handyman_rounded,
+                      color: AppColors.forestGreen,
+                      size: 24,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          children: [
+                            Text(
+                              '$trade Specialist',
+                              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 16),
+                            ),
+                            const SizedBox(width: 6),
+                            const Icon(Icons.verified_rounded, color: AppColors.forestGreen, size: 16),
+                          ],
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          user?.cooperativeName ?? 'Bhopal Central Co-op · Ward 14',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 14),
+              const Divider(height: 1),
+              const SizedBox(height: 12),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceAround,
+                children: [
+                  _buildMetricPill(
+                    icon: Icons.star_rounded,
+                    iconColor: Colors.amber.shade700,
+                    value: '${(workerProfile?.ratingAvg ?? 4.8).toStringAsFixed(1)} ★',
+                    label: 'Co-op Rating',
+                    isDark: isDark,
+                  ),
+                  _buildMetricPill(
+                    icon: Icons.task_alt_rounded,
+                    iconColor: AppColors.forestGreen,
+                    value: '${workerProfile?.jobsCompleted ?? 0}',
+                    label: 'Jobs Done',
+                    isDark: isDark,
+                  ),
+                  _buildMetricPill(
+                    icon: Icons.percent_rounded,
+                    iconColor: AppColors.forestGreen,
+                    value: '85%',
+                    label: 'Take-Home',
+                    isDark: isDark,
+                  ),
+                  _buildMetricPill(
+                    icon: Icons.health_and_safety_rounded,
+                    iconColor: AppColors.verified,
+                    value: 'Active',
+                    label: 'Welfare Fund',
+                    isDark: isDark,
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        const SizedBox(height: 18),
+
+        // 3. COOPERATIVE FAIR WAGE BREAKDOWN STRIP
+        const TrustStrip(),
+        const SizedBox(height: 24),
+
+        // 4. ACTION HUB (2x2 GRID)
+        Text(
+          'Quick Operations',
+          style: TextStyle(
+            fontSize: 17,
+            fontWeight: FontWeight.w800,
+            letterSpacing: -0.3,
+            color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+          ),
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildActionCard(
+                context: context,
+                title: 'Job Requests',
+                subtitle: 'Review & accept gigs',
+                icon: Icons.assignment_turned_in_outlined,
+                iconColor: AppColors.primaryLight,
+                badgeText: bookingCtrl.pendingRequests.isNotEmpty
+                    ? '${bookingCtrl.pendingRequests.length} New'
+                    : null,
+                isDark: isDark,
+                onTap: () {
+                  Navigator.of(context).push(
+                    BottomSlideRoute(page: const JobRequestsScreen()),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildActionCard(
+                context: context,
+                title: 'My Earnings',
+                subtitle: '85% wage payouts',
+                icon: Icons.account_balance_wallet_outlined,
+                iconColor: AppColors.verified,
+                badgeText: '₹${bookingCtrl.totalWorkerEarnings.toStringAsFixed(0)}',
+                isDark: isDark,
+                onTap: () {
+                  Navigator.of(context).push(
+                    BottomSlideRoute(page: const EarningsScreen()),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        Row(
+          children: [
+            Expanded(
+              child: _buildActionCard(
+                context: context,
+                title: 'KYC & Badges',
+                subtitle: 'Aadhaar & clearance',
+                icon: Icons.verified_user_outlined,
+                iconColor: AppColors.forestGreen,
+                badgeText: 'Verified',
+                isDark: isDark,
+                onTap: () {
+                  Navigator.of(context).push(
+                    BottomSlideRoute(page: const DocumentUploadScreen()),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: _buildActionCard(
+                context: context,
+                title: 'Union Grievance',
+                subtitle: 'Support & SOS desk',
+                icon: Icons.support_agent_rounded,
+                iconColor: AppColors.pending,
+                isDark: isDark,
+                onTap: () {
+                  Navigator.of(context).push(
+                    BottomSlideRoute(page: const GrievanceScreen()),
+                  );
+                },
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 26),
+
+        // 5. TODAY'S ACTIVE GIGS QUEUE
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             Text(
-              'Worker Dashboard',
+              "Today's Gigs Queue",
               style: TextStyle(
                 fontSize: 17,
                 fontWeight: FontWeight.w800,
@@ -542,129 +900,313 @@ class _HomeScreenState extends State<HomeScreen> {
               ),
             ),
             Container(
-              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
               decoration: BoxDecoration(
-                color: AppColors.forestGreen.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(20),
+                color: AppColors.forestGreen.withValues(alpha: 0.12),
+                borderRadius: BorderRadius.circular(12),
               ),
-              child: Text(
-                trade,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w700,
-                  color: AppColors.forestGreen,
-                ),
+              child: Row(
+                children: [
+                  Container(
+                    width: 6,
+                    height: 6,
+                    decoration: const BoxDecoration(
+                      color: AppColors.forestGreen,
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                  const SizedBox(width: 5),
+                  Text(
+                    '${activeGigs.length} Active',
+                    style: const TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w700,
+                      color: AppColors.forestGreen,
+                    ),
+                  ),
+                ],
               ),
             ),
           ],
         ),
-        const SizedBox(height: 14),
-        Row(
-          children: [
-            Expanded(
-              child: InkWell(
-                onTap: () {
-                  Navigator.of(context).push(
-                    BottomSlideRoute(page: const JobRequestsScreen()),
-                  );
-                },
-                borderRadius: BorderRadius.circular(18),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.surfaceDark : Colors.white,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: isDark ? AppColors.borderDark : const Color(0xFFE2EBE5),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColors.primaryLight.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.assignment_turned_in_outlined, color: AppColors.primaryLight, size: 22),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'Job Requests',
-                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'View & accept incoming gigs',
-                        style: TextStyle(fontSize: 12, color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
-                      ),
-                    ],
-                  ),
-                ),
+        const SizedBox(height: 12),
+
+        if (activeGigs.isNotEmpty) ...[
+          ...activeGigs.map((booking) => _buildActiveGigCard(context, booking, isDark)),
+        ] else ...[
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+            decoration: BoxDecoration(
+              color: isDark ? AppColors.surfaceDark : Colors.white,
+              borderRadius: BorderRadius.circular(18),
+              border: Border.all(
+                color: isDark ? AppColors.borderDark : const Color(0xFFE2EBE5),
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: InkWell(
-                onTap: () {
-                  Navigator.of(context).push(
-                    BottomSlideRoute(page: const EarningsScreen()),
-                  );
-                },
-                borderRadius: BorderRadius.circular(18),
-                child: Container(
-                  padding: const EdgeInsets.all(16),
+            child: Column(
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(12),
                   decoration: BoxDecoration(
-                    color: isDark ? AppColors.surfaceDark : Colors.white,
-                    borderRadius: BorderRadius.circular(18),
-                    border: Border.all(
-                      color: isDark ? AppColors.borderDark : const Color(0xFFE2EBE5),
-                    ),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
-                        blurRadius: 8,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
+                    color: AppColors.forestGreen.withValues(alpha: 0.1),
+                    shape: BoxShape.circle,
                   ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Container(
-                        padding: const EdgeInsets.all(10),
-                        decoration: BoxDecoration(
-                          color: AppColors.verified.withValues(alpha: 0.1),
-                          shape: BoxShape.circle,
-                        ),
-                        child: const Icon(Icons.account_balance_wallet_outlined, color: AppColors.verified, size: 22),
-                      ),
-                      const SizedBox(height: 12),
-                      const Text(
-                        'My Earnings',
-                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        '85% payout & welfare cut',
-                        style: TextStyle(fontSize: 12, color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
-                      ),
-                    ],
+                  child: const Icon(
+                    Icons.radar_rounded,
+                    color: AppColors.forestGreen,
+                    size: 26,
                   ),
                 ),
+                const SizedBox(height: 12),
+                const Text(
+                  'Waiting for nearby gig requests',
+                  style: TextStyle(
+                    fontWeight: FontWeight.w800,
+                    fontSize: 15,
+                  ),
+                ),
+                const SizedBox(height: 5),
+                Text(
+                  'You are Online in Bhopal Central Co-op. New $trade bookings within 5 km will show here automatically.',
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+        const SizedBox(height: 20),
+      ],
+    );
+  }
+
+  Widget _buildMetricPill({
+    required IconData icon,
+    required Color iconColor,
+    required String value,
+    required String label,
+    required bool isDark,
+  }) {
+    return Column(
+      children: [
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(icon, size: 14, color: iconColor),
+            const SizedBox(width: 4),
+            Text(
+              value,
+              style: TextStyle(
+                fontWeight: FontWeight.w800,
+                fontSize: 13,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
               ),
             ),
           ],
+        ),
+        const SizedBox(height: 2),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 10,
+            fontWeight: FontWeight.w500,
+            color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+          ),
         ),
       ],
+    );
+  }
+
+  Widget _buildActionCard({
+    required BuildContext context,
+    required String title,
+    required String subtitle,
+    required IconData icon,
+    required Color iconColor,
+    String? badgeText,
+    required bool isDark,
+    required VoidCallback onTap,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(18),
+      child: Container(
+        padding: const EdgeInsets.all(14),
+        decoration: BoxDecoration(
+          color: isDark ? AppColors.surfaceDark : Colors.white,
+          borderRadius: BorderRadius.circular(18),
+          border: Border.all(
+            color: isDark ? AppColors.borderDark : const Color(0xFFE2EBE5),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+              blurRadius: 8,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Container(
+                  padding: const EdgeInsets.all(9),
+                  decoration: BoxDecoration(
+                    color: iconColor.withValues(alpha: 0.12),
+                    shape: BoxShape.circle,
+                  ),
+                  child: Icon(icon, color: iconColor, size: 20),
+                ),
+                if (badgeText != null) ...[
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: iconColor.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(8),
+                    ),
+                    child: Text(
+                      badgeText,
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800,
+                        color: iconColor,
+                      ),
+                    ),
+                  ),
+                ],
+              ],
+            ),
+            const SizedBox(height: 10),
+            Text(
+              title,
+              style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+            ),
+            const SizedBox(height: 2),
+            Text(
+              subtitle,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: 11,
+                color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildActiveGigCard(BuildContext context, Booking booking, bool isDark) {
+    final isPending = booking.status == 'pending';
+    final statusColor = isPending ? AppColors.pending : AppColors.forestGreen;
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: isDark ? AppColors.surfaceDark : Colors.white,
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(
+          color: isDark ? AppColors.borderDark : const Color(0xFFE2EBE5),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.02),
+            blurRadius: 6,
+            offset: const Offset(0, 2),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: statusColor.withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Icon(
+              isPending ? Icons.pending_actions_rounded : Icons.handyman_rounded,
+              color: statusColor,
+              size: 22,
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        booking.serviceTitle ?? 'Home Service',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(fontWeight: FontWeight.w800, fontSize: 14),
+                      ),
+                    ),
+                    Text(
+                      '₹${booking.workerPayout.toStringAsFixed(0)}',
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w800,
+                        fontSize: 14,
+                        color: AppColors.forestGreen,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 3),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      '${booking.customerName ?? 'Customer'} · ${booking.slotType.toUpperCase()}',
+                      style: TextStyle(
+                        fontSize: 11,
+                        color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight,
+                      ),
+                    ),
+                    Text(
+                      booking.status.toUpperCase(),
+                      style: TextStyle(
+                        fontSize: 10,
+                        fontWeight: FontWeight.w700,
+                        color: statusColor,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          const SizedBox(width: 8),
+          IconButton(
+            icon: const Icon(Icons.arrow_forward_ios_rounded, size: 14),
+            color: Colors.grey.shade400,
+            onPressed: () {
+              Navigator.of(context).push(
+                BottomSlideRoute(
+                  page: BookingDetailScreen(
+                    bookingId: booking.id,
+                    initialBooking: booking,
+                  ),
+                ),
+              );
+            },
+          ),
+        ],
+      ),
     );
   }
 

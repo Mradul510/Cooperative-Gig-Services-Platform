@@ -18,8 +18,12 @@ function generateToken(user) {
   );
 }
 
-function sanitizeUser(user) {
+function sanitizeUser(user, db) {
   const { password_hash, ...safe } = user;
+  if (user && user.role === 'worker' && db) {
+    const profile = db.prepare('SELECT * FROM worker_profiles WHERE user_id = ?').get(user.id);
+    safe.worker_profile = profile || null;
+  }
   return safe;
 }
 
@@ -94,7 +98,10 @@ router.post('/register', (req, res) => {
       const userId = result.lastInsertRowid;
 
       if (role === 'worker') {
-        const selectedTrade = trade_category || 'Cleaning';
+        let selectedTrade = trade_category ? trade_category.trim() : 'Cleaning';
+        if (selectedTrade.length > 0) {
+          selectedTrade = selectedTrade.charAt(0).toUpperCase() + selectedTrade.slice(1);
+        }
         db.prepare(`
           INSERT INTO worker_profiles (user_id, trade_category, aadhaar_status, police_status, certificate_status, availability, latitude, longitude, rating_avg, jobs_completed)
           VALUES (?, ?, 'approved', 'approved', 'approved', 1, 23.2599, 77.4126, 4.8, 0)
@@ -121,7 +128,7 @@ router.post('/register', (req, res) => {
 
     return res.status(201).json({
       success: true,
-      data: { token, user: sanitizeUser(newUser) },
+      data: { token, user: sanitizeUser(newUser, db) },
     });
   } catch (err) {
     console.error('[auth/register]', err);
@@ -158,7 +165,7 @@ router.post('/login', (req, res) => {
     }
 
     const token = generateToken(user);
-    return res.json({ success: true, data: { token, user: sanitizeUser(user) } });
+    return res.json({ success: true, data: { token, user: sanitizeUser(user, db) } });
   } catch (err) {
     console.error('[auth/login]', err);
     return res.status(500).json({ success: false, error: 'Login failed.' });
@@ -176,13 +183,7 @@ router.get('/me', requireAuth, (req, res) => {
       return res.status(404).json({ success: false, error: 'User not found.' });
     }
 
-    const safe = sanitizeUser(user);
-
-    if (user.role === 'worker') {
-      const profile = db.prepare('SELECT * FROM worker_profiles WHERE user_id = ?').get(user.id);
-      safe.worker_profile = profile || null;
-    }
-
+    const safe = sanitizeUser(user, db);
     return res.json({ success: true, data: safe });
   } catch (err) {
     console.error('[auth/me]', err);

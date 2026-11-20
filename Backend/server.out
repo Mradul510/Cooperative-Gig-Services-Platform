@@ -1,0 +1,4 @@
+[migrations] Schema up to date.
+[seed] Data already seeded – skipping.
+CoopGig API running on port 2000
+Admin dashboard: http://localhost:2000/admin

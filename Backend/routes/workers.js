@@ -41,8 +41,8 @@ const upload = multer({
 });
 
 // ── GET /api/workers ──────────────────────────────────────────────────────────
-
-router.get('/', requireAuth, (req, res) => {
+// Public/Customer discoverable endpoint: list available online workers within radius
+router.get('/', (req, res) => {
   try {
     const db = req.app.locals.db;
     let { lat, lng, radius, category } = req.query;
@@ -169,7 +169,12 @@ router.patch('/availability', requireAuth, requireRole('worker'), (req, res) => 
       return res.status(404).json({ success: false, error: 'Worker profile not found.' });
     }
 
-    const newAvailability = profile.availability === 1 ? 0 : 1;
+    let newAvailability;
+    if (req.body && req.body.availability !== undefined) {
+      newAvailability = (req.body.availability === 1 || req.body.availability === true || req.body.availability === '1') ? 1 : 0;
+    } else {
+      newAvailability = profile.availability === 1 ? 0 : 1;
+    }
     db.prepare('UPDATE worker_profiles SET availability = ? WHERE user_id = ?').run(newAvailability, userId);
 
     return res.json({

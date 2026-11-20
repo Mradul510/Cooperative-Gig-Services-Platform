@@ -144,3 +144,4 @@ const all = db.prepare(`
 `).all();
 
 console.table(all);
+

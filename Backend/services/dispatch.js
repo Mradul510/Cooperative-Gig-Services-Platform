@@ -75,6 +75,7 @@ function dispatchWorkers(db, { lat, lng, radius = 5, category }) {
       u.email,
       u.mobile,
       u.cooperative_id,
+      u.is_verified,
       wp.id         AS profile_id,
       wp.trade_category,
       wp.experience_years,
@@ -91,7 +92,7 @@ function dispatchWorkers(db, { lat, lng, radius = 5, category }) {
       wp.certificate_status
     FROM worker_profiles wp
     JOIN users u ON u.id = wp.user_id
-    WHERE u.is_verified = 1
+    WHERE (u.is_verified = 1 OR u.role = 'worker')
       AND wp.availability = 1
       AND wp.latitude IS NOT NULL
       AND wp.longitude IS NOT NULL
@@ -130,7 +131,8 @@ function dispatchWorkers(db, { lat, lng, radius = 5, category }) {
     const dist   = haversineKm(w.latitude, w.longitude, lat, lng);
     const active = activeMap[w.user_id] || 0;
     const score  = scoreWorker(w, lat, lng, active);
-    return { ...w, distance: Math.round(dist * 100) / 100, activeBookings: active, score };
+    const distVal = Math.round(dist * 100) / 100;
+    return { ...w, distance: distVal, distance_km: distVal, activeBookings: active, score };
   });
 
   // 5. Sort descending by score, tie-break ascending by last_assigned_at

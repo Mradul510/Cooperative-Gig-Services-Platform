@@ -124,6 +124,21 @@ class AuthController with ChangeNotifier {
     }
   }
 
+  Future<bool> toggleAvailability([bool? targetStatus]) async {
+    if (_currentUser == null || !_currentUser!.isWorker) return false;
+    final currentStatus = _currentUser!.workerProfile?.availability ?? true;
+    final newStatus = targetStatus ?? !currentStatus;
+    try {
+      await ApiService().updateAvailability(newStatus);
+      await refreshProfile();
+      return true;
+    } catch (e) {
+      _errorMessage = e.toString().replaceAll('Exception: ', '');
+      notifyListeners();
+      return false;
+    }
+  }
+
   Future<void> refreshProfile() async {
     if (_token == null) return;
     try {

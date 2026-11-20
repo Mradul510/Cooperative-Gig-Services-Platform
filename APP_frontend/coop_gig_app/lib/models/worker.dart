@@ -122,6 +122,7 @@ class WorkerFeedItem {
   });
 
   factory WorkerFeedItem.fromJson(Map<String, dynamic> json) {
+    final rawDist = json['distance_km'] ?? json['distance'];
     return WorkerFeedItem(
       userId: json['user_id'] is int ? json['user_id'] : int.parse(json['user_id'].toString()),
       name: json['name'] ?? '',
@@ -131,7 +132,7 @@ class WorkerFeedItem {
       isVerified: json['is_verified'] == 1 || json['is_verified'] == true,
       welfareActive: json['welfare_active'] == 1 || json['welfare_active'] == true,
       visitFee: (json['visit_fee'] != null) ? double.parse(json['visit_fee'].toString()) : 399.0,
-      distanceKm: (json['distance_km'] != null) ? double.parse(json['distance_km'].toString()) : 1.2,
+      distanceKm: (rawDist != null) ? double.parse(rawDist.toString()) : 0.5,
       cooperativeRegNo: json['cooperative_reg_no'],
       availability: json['availability'] == 1 || json['availability'] == true,
     );
