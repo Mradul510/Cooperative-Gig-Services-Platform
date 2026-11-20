@@ -33,3 +33,4 @@ function cleanFile(filePath) {
 const baseDir = path.join(__dirname, '..', 'APP_frontend', 'coop_gig_app', 'lib');
 cleanFile(path.join(baseDir, 'views', 'category', 'category_screen.dart'));
 cleanFile(path.join(baseDir, 'views', 'home', 'home_screen.dart'));
+

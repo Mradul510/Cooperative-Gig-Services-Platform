@@ -112,9 +112,29 @@ class _AuthSheetState extends State<AuthSheet> {
     }
   }
 
+  Widget _buildDemoChip({
+    required String label,
+    required IconData icon,
+    required String email,
+    required String pwd,
+  }) {
+    return ActionChip(
+      avatar: Icon(icon, size: 14, color: AppColors.primaryLight),
+      label: Text(label, style: const TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+      backgroundColor: AppColors.forestGreenLight,
+      side: const BorderSide(color: AppColors.borderLight),
+      onPressed: () {
+        setState(() {
+          _loginIdentifierController.text = email;
+          _loginPasswordController.text = pwd;
+        });
+        _submitLogin();
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final isDark = Theme.of(context).brightness == Brightness.dark;
     final settings = Provider.of<SettingsProvider>(context);
     final auth = Provider.of<AuthController>(context);
 
@@ -137,159 +157,212 @@ class _AuthSheetState extends State<AuthSheet> {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-              // Top drag indicator
-              Center(
-                child: Container(
-                  width: 40,
-                  height: 4,
-                  margin: const EdgeInsets.only(bottom: 16),
-                  decoration: BoxDecoration(
-                    color: isDark ? AppColors.borderDark : AppColors.borderLight,
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-              ),
-
-              // Language toggle + header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    _isLogin
-                        ? AppStrings.get(context, 'login')
-                        : AppStrings.get(context, 'register'),
-                    style: const TextStyle(
-                      fontSize: 22,
-                      fontWeight: FontWeight.w800,
+                Center(
+                  child: Container(
+                    width: 40,
+                    height: 4,
+                    margin: const EdgeInsets.only(bottom: 16),
+                    decoration: BoxDecoration(
+                      color: AppColors.borderLight,
+                      borderRadius: BorderRadius.circular(2),
                     ),
                   ),
-                  InkWell(
-                    onTap: () {
-                      final newLang = settings.locale.languageCode == 'en' ? 'hi' : 'en';
-                      settings.setLocale(newLang);
-                    },
-                    borderRadius: BorderRadius.circular(20),
-                    child: Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Theme.of(context).cardTheme.color,
-                        borderRadius: BorderRadius.circular(20),
-                        border: Border.all(
-                          color: isDark ? AppColors.borderDark : AppColors.borderLight,
-                        ),
-                      ),
-                      child: Row(
-                        children: [
-                          const Icon(Icons.language, size: 14, color: AppColors.primaryLight),
-                          const SizedBox(width: 4),
-                          Text(
-                            settings.locale.languageCode == 'en' ? 'हिन्दी' : 'English',
-                            style: const TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 16),
-
-              // Tab Toggle: Login vs Register
-              Container(
-                decoration: BoxDecoration(
-                  color: isDark ? AppColors.surfaceDark : AppColors.surfaceLight,
-                  borderRadius: BorderRadius.circular(10),
-                  border: Border.all(
-                    color: isDark ? AppColors.borderDark : AppColors.borderLight,
-                  ),
                 ),
-                child: Row(
+
+                // Language toggle + header
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => setState(() => _isLogin = true),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: _isLogin ? AppColors.primaryLight : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            AppStrings.get(context, 'login'),
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: _isLogin ? Colors.white : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
-                            ),
-                          ),
-                        ),
+                    Text(
+                      _isLogin
+                          ? AppStrings.get(context, 'login')
+                          : AppStrings.get(context, 'register'),
+                      style: const TextStyle(
+                        fontSize: 22,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
-                    Expanded(
-                      child: GestureDetector(
-                        onTap: () => setState(() => _isLogin = false),
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(vertical: 10),
-                          decoration: BoxDecoration(
-                            color: !_isLogin ? AppColors.primaryLight : Colors.transparent,
-                            borderRadius: BorderRadius.circular(8),
+                    InkWell(
+                      onTap: () {
+                        final newLang = settings.locale.languageCode == 'en' ? 'hi' : 'en';
+                        settings.setLocale(newLang);
+                      },
+                      borderRadius: BorderRadius.circular(20),
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                        decoration: BoxDecoration(
+                          color: Theme.of(context).cardTheme.color,
+                          borderRadius: BorderRadius.circular(20),
+                          border: Border.all(
+                            color: AppColors.borderLight,
                           ),
-                          alignment: Alignment.center,
-                          child: Text(
-                            AppStrings.get(context, 'register'),
-                            style: TextStyle(
-                              fontWeight: FontWeight.w700,
-                              color: !_isLogin ? Colors.white : (isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
+                        ),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.language, size: 14, color: AppColors.primaryLight),
+                            const SizedBox(width: 4),
+                            Text(
+                              settings.locale.languageCode == 'en' ? 'हिन्दी' : 'English',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                fontWeight: FontWeight.w600,
+                              ),
                             ),
-                          ),
+                          ],
                         ),
                       ),
                     ),
                   ],
                 ),
-              ),
-              const SizedBox(height: 20),
+                const SizedBox(height: 16),
 
-              if (_isLogin) ...[
-                // LOGIN FORM
-                TextField(
-                  controller: _loginIdentifierController,
-                  decoration: InputDecoration(
-                    labelText: AppStrings.get(context, 'email_or_mobile'),
-                    prefixIcon: const Icon(Icons.person_outline, size: 20),
-                  ),
-                ),
-                const SizedBox(height: 14),
-                TextField(
-                  controller: _loginPasswordController,
-                  obscureText: _obscurePassword,
-                  decoration: InputDecoration(
-                    labelText: AppStrings.get(context, 'password'),
-                    prefixIcon: const Icon(Icons.lock_outline, size: 20),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword ? Icons.visibility_off : Icons.visibility,
-                        size: 20,
-                      ),
-                      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                // Tab Toggle: Login vs Register
+                Container(
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceLight,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(
+                      color: AppColors.borderLight,
                     ),
                   ),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setState(() => _isLogin = true),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                              color: _isLogin ? AppColors.primaryLight : Colors.transparent,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              AppStrings.get(context, 'login'),
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: _isLogin ? Colors.white : AppColors.textSecondaryLight,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Expanded(
+                        child: GestureDetector(
+                          onTap: () => setState(() => _isLogin = false),
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(vertical: 10),
+                            decoration: BoxDecoration(
+                              color: !_isLogin ? AppColors.primaryLight : Colors.transparent,
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            alignment: Alignment.center,
+                            child: Text(
+                              AppStrings.get(context, 'register'),
+                              style: TextStyle(
+                                fontWeight: FontWeight.w700,
+                                color: !_isLogin ? Colors.white : AppColors.textSecondaryLight,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: auth.isLoading ? null : _submitLogin,
-                  child: auth.isLoading
-                      ? const SizedBox(
-                          height: 20,
-                          width: 20,
-                          child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
-                        )
-                      : Text(AppStrings.get(context, 'sign_in')),
-                ),
-              ] else ...[
+                const SizedBox(height: 20),
+
+                if (_isLogin) ...[
+                  // LOGIN FORM
+                  TextField(
+                    controller: _loginIdentifierController,
+                    decoration: InputDecoration(
+                      labelText: AppStrings.get(context, 'email_or_mobile'),
+                      prefixIcon: const Icon(Icons.person_outline, size: 20),
+                    ),
+                  ),
+                  const SizedBox(height: 14),
+                  TextField(
+                    controller: _loginPasswordController,
+                    obscureText: _obscurePassword,
+                    decoration: InputDecoration(
+                      labelText: AppStrings.get(context, 'password'),
+                      prefixIcon: const Icon(Icons.lock_outline, size: 20),
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                          size: 20,
+                        ),
+                        onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: auth.isLoading ? null : _submitLogin,
+                    child: auth.isLoading
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                          )
+                        : Text(AppStrings.get(context, 'sign_in')),
+                  ),
+                  const SizedBox(height: 16),
+                  const Divider(),
+                  const SizedBox(height: 8),
+                  const Row(
+                    children: [
+                      Icon(Icons.bolt, size: 16, color: AppColors.primaryLight),
+                      SizedBox(width: 6),
+                      Text(
+                        '1-Tap Demo Logins (Password: password123)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w600,
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      _buildDemoChip(
+                        label: 'Priya (Customer)',
+                        icon: Icons.person_outline,
+                        email: 'priya@example.com',
+                        pwd: 'password123',
+                      ),
+                      _buildDemoChip(
+                        label: 'Ramesh (Electrician)',
+                        icon: Icons.flash_on,
+                        email: 'ramesh@coopgig.com',
+                        pwd: 'password123',
+                      ),
+                      _buildDemoChip(
+                        label: 'Vikram (Carpenter)',
+                        icon: Icons.handyman_outlined,
+                        email: 'vikram@coopgig.com',
+                        pwd: 'password123',
+                      ),
+                      _buildDemoChip(
+                        label: 'Suresh (Plumber)',
+                        icon: Icons.water_drop_outlined,
+                        email: 'suresh@coopgig.com',
+                        pwd: 'password123',
+                      ),
+                      _buildDemoChip(
+                        label: 'Admin',
+                        icon: Icons.admin_panel_settings_outlined,
+                        email: 'admin@coopgig.com',
+                        pwd: 'password123',
+                      ),
+                    ],
+                  ),
+                ] else ...[
                 // REGISTER FORM
                 TextField(
                   controller: _regNameController,
