@@ -52,7 +52,7 @@ class CoopGigApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      initialRoute: '/',
+      initialRoute: '/home',
       onGenerateRoute: (routeSettings) {
         final rawName = routeSettings.name ?? '/';
         final uri = Uri.parse(rawName);

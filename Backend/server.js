@@ -112,4 +112,17 @@ app.listen(config.PORT, () => {
   console.log(`Admin dashboard: http://localhost:${config.PORT}/admin`);
 });
 
+// Dual listener on port 2000 for compatibility with any legacy client config
+try {
+  const fallbackPort = 2000;
+  if (config.PORT !== fallbackPort) {
+    const fallbackServer = app.listen(fallbackPort, () => {
+      console.log(`CoopGig API dual listener running on port ${fallbackPort}`);
+    });
+    fallbackServer.on('error', (e) => {
+      console.warn(`[dual-port 2000] Note: Port 2000 could not be bound (${e.message}), continuing on port ${config.PORT}`);
+    });
+  }
+} catch (_) {}
+
 module.exports = app;

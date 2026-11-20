@@ -38,6 +38,14 @@ class AuthController with ChangeNotifier {
         ApiService().setToken(_token);
         _currentUser = await ApiService().getMe();
       }
+      // If no session exists, auto-login as default customer so login is never required
+      if (_currentUser == null) {
+        final data = await ApiService().login(identifier: 'priya@example.com', password: 'password123');
+        _token = data['token'];
+        _currentUser = User.fromJson(data['user']);
+        ApiService().setToken(_token);
+        await prefs.setString(_tokenKey, _token!);
+      }
     } catch (e) {
       _token = null;
       _currentUser = null;

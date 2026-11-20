@@ -182,35 +182,46 @@ class _AuthSheetState extends State<AuthSheet> {
                         fontWeight: FontWeight.w800,
                       ),
                     ),
-                    InkWell(
-                      onTap: () {
-                        final newLang = settings.locale.languageCode == 'en' ? 'hi' : 'en';
-                        settings.setLocale(newLang);
-                      },
-                      borderRadius: BorderRadius.circular(20),
-                      child: Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context).cardTheme.color,
+                    Row(
+                      children: [
+                        InkWell(
+                          onTap: () {
+                            final newLang = settings.locale.languageCode == 'en' ? 'hi' : 'en';
+                            settings.setLocale(newLang);
+                          },
                           borderRadius: BorderRadius.circular(20),
-                          border: Border.all(
-                            color: AppColors.borderLight,
-                          ),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.language, size: 14, color: AppColors.primaryLight),
-                            const SizedBox(width: 4),
-                            Text(
-                              settings.locale.languageCode == 'en' ? 'हिन्दी' : 'English',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                fontWeight: FontWeight.w600,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+                            decoration: BoxDecoration(
+                              color: Theme.of(context).cardTheme.color,
+                              borderRadius: BorderRadius.circular(20),
+                              border: Border.all(
+                                color: AppColors.borderLight,
                               ),
                             ),
-                          ],
+                            child: Row(
+                              children: [
+                                const Icon(Icons.language, size: 14, color: AppColors.primaryLight),
+                                const SizedBox(width: 4),
+                                Text(
+                                  settings.locale.languageCode == 'en' ? 'हिन्दी' : 'English',
+                                  style: const TextStyle(
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
-                      ),
+                        const SizedBox(width: 8),
+                        IconButton(
+                          icon: const Icon(Icons.close, size: 20),
+                          padding: EdgeInsets.zero,
+                          constraints: const BoxConstraints(),
+                          onPressed: () => Navigator.of(context).pop(),
+                        ),
+                      ],
                     ),
                   ],
                 ),
