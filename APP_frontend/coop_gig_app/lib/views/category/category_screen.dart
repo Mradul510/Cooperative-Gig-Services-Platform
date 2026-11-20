@@ -96,52 +96,60 @@ class _CategoryScreenState extends State<CategoryScreen> {
     final selectedService = categoryCtrl.selectedService ?? (services.isNotEmpty ? services.first : null);
     final categoryWorkers = workerCtrl.workers;
 
-    return Container(
-      decoration: BoxDecoration(
-        gradient: isDark ? AppColors.darkSageGradient : AppColors.sageGradient,
-      ),
-      child: Scaffold(
-        backgroundColor: Colors.transparent,
-        appBar: AppBar(
+    return PopScope(
+      canPop: true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (didPop) return;
+        if (Navigator.of(context).canPop()) {
+          Navigator.of(context).pop();
+        }
+      },
+      child: Container(
+        decoration: BoxDecoration(
+          gradient: isDark ? AppColors.darkSageGradient : AppColors.sageGradient,
+        ),
+        child: Scaffold(
           backgroundColor: Colors.transparent,
-          elevation: 0,
-          leading: Padding(
-            padding: const EdgeInsets.only(left: 16),
-            child: Center(
-              child: Container(
-                width: 40,
-                height: 40,
-                decoration: BoxDecoration(
+          appBar: AppBar(
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            leadingWidth: 68,
+            leading: Padding(
+              padding: const EdgeInsets.only(left: 16),
+              child: Center(
+                child: Material(
                   color: isDark ? AppColors.surfaceDark : Colors.white,
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.04),
-                      blurRadius: 8,
-                      offset: const Offset(0, 2),
+                  shape: const CircleBorder(),
+                  elevation: 2,
+                  shadowColor: Colors.black12,
+                  child: InkWell(
+                    customBorder: const CircleBorder(),
+                    onTap: () {
+                      if (Navigator.of(context).canPop()) {
+                        Navigator.of(context).pop();
+                      }
+                    },
+                    child: SizedBox(
+                      width: 40,
+                      height: 40,
+                      child: Icon(
+                        Icons.chevron_left_rounded,
+                        size: 26,
+                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                      ),
                     ),
-                  ],
-                ),
-                child: IconButton(
-                  icon: Icon(
-                    Icons.chevron_left_rounded,
-                    size: 24,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                   ),
-                  onPressed: () => Navigator.of(context).pop(),
-                  padding: EdgeInsets.zero,
                 ),
               ),
             ),
-          ),
-          title: Text(
-            '${widget.category.name} Services',
-            style: TextStyle(
-              fontSize: 17,
-              fontWeight: FontWeight.w800,
-              color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+            title: Text(
+              '${widget.category.name} Services',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+              ),
             ),
-          ),
           actions: [
             Padding(
               padding: const EdgeInsets.only(right: 16),
@@ -425,6 +433,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                                     categoryName: widget.category.name,
                                     selectedService: selectedService,
                                   ),
+                                  settings: RouteSettings(name: '/workers/${widget.category.name}'),
                                 ),
                               );
                             }
@@ -448,8 +457,9 @@ class _CategoryScreenState extends State<CategoryScreen> {
           ],
         ),
       ),
-    );
-  }
+    ),
+  );
+}
 
   Widget _buildCategoryWorkerCard(
     BuildContext context,

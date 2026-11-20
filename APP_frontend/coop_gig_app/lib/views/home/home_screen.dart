@@ -395,7 +395,10 @@ class _HomeScreenState extends State<HomeScreen> {
                       );
                 categoryCtrl.selectCategory(targetCategory);
                 Navigator.of(context).push(
-                  BottomSlideRoute(page: CategoryScreen(category: targetCategory)),
+                  BottomSlideRoute(
+                    page: CategoryScreen(category: targetCategory),
+                    settings: RouteSettings(name: '/category/${targetCategory.name}'),
+                  ),
                 );
               },
               borderRadius: BorderRadius.circular(22),
