@@ -24,10 +24,13 @@ class EarningsScreen extends StatelessWidget {
       (sum, b) => sum + b.welfarePayout,
     );
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppStrings.get(context, 'earnings')),
-      ),
+    return Container(
+      decoration: const BoxDecoration(gradient: AppColors.sageGradient),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: Text(AppStrings.get(context, 'earnings')),
+        ),
       body: RefreshIndicator(
         onRefresh: () => bookingCtrl.fetchBookings(),
         child: SingleChildScrollView(
@@ -172,6 +175,7 @@ class EarningsScreen extends StatelessWidget {
           ),
         ),
       ),
+    ),
     );
   }
 

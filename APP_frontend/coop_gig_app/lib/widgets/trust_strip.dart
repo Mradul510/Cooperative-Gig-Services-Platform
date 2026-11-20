@@ -82,12 +82,10 @@ class TrustStrip extends StatelessWidget {
             Text(
               label,
               maxLines: 1,
-              style: TextStyle(
+              style: const TextStyle(
                 fontSize: 11.5,
                 fontWeight: FontWeight.w600,
-                color: Theme.of(context).brightness == Brightness.dark
-                    ? AppColors.textPrimaryDark
-                    : AppColors.textPrimaryLight,
+                color: AppColors.textPrimaryLight,
               ),
             ),
           ],

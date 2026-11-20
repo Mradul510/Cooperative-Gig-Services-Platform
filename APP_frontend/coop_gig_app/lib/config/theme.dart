@@ -65,7 +65,7 @@ class AppTheme {
       useMaterial3: true,
       brightness: Brightness.light,
       primaryColor: AppColors.forestGreen,
-      scaffoldBackgroundColor: Colors.transparent, // Uses AppColors.sageGradient container
+      scaffoldBackgroundColor: const Color(0xFFEFF5F0), // Clean light sage background
       colorScheme: const ColorScheme.light(
         primary: AppColors.forestGreen,
         onPrimary: Colors.white,
@@ -161,65 +161,5 @@ class AppTheme {
     );
   }
 
-  static ThemeData get darkTheme {
-    return ThemeData(
-      useMaterial3: true,
-      brightness: Brightness.dark,
-      primaryColor: AppColors.forestGreenSubtle,
-      scaffoldBackgroundColor: Colors.transparent,
-      colorScheme: const ColorScheme.dark(
-        primary: AppColors.forestGreenSubtle,
-        onPrimary: AppColors.forestGreenDark,
-        secondary: AppColors.forestGreenSubtle,
-        onSecondary: Colors.white,
-        surface: AppColors.surfaceDark,
-        onSurface: AppColors.textPrimaryDark,
-        error: AppColors.error,
-        onError: Colors.white,
-      ),
-      appBarTheme: const AppBarTheme(
-        backgroundColor: Colors.transparent,
-        foregroundColor: AppColors.textPrimaryDark,
-        elevation: 0,
-        scrolledUnderElevation: 0,
-        centerTitle: true,
-        titleTextStyle: TextStyle(
-          color: AppColors.textPrimaryDark,
-          fontSize: 18,
-          fontWeight: FontWeight.w700,
-        ),
-      ),
-      cardTheme: CardThemeData(
-        color: AppColors.surfaceDark,
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(22),
-          side: const BorderSide(color: AppColors.borderDark, width: 1),
-        ),
-        margin: EdgeInsets.zero,
-      ),
-      elevatedButtonTheme: ElevatedButtonThemeData(
-        style: ElevatedButton.styleFrom(
-          backgroundColor: AppColors.forestGreenSubtle,
-          foregroundColor: AppColors.forestGreenDark,
-          elevation: 0,
-          minimumSize: const Size(double.infinity, 50),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(30),
-          ),
-          textStyle: const TextStyle(
-            fontSize: 15,
-            fontWeight: FontWeight.w700,
-          ),
-        ),
-      ),
-      bottomSheetTheme: const BottomSheetThemeData(
-        backgroundColor: AppColors.surfaceDark,
-        surfaceTintColor: Colors.transparent,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.vertical(top: Radius.circular(28)),
-        ),
-      ),
-    );
-  }
+  static ThemeData get darkTheme => lightTheme; // Strictly light theme across all screens
 }

@@ -24,9 +24,7 @@ class AvailabilityToggle extends StatelessWidget {
         border: Border.all(
           color: isOnline
               ? AppColors.verified
-              : (Theme.of(context).brightness == Brightness.dark
-                  ? AppColors.borderDark
-                  : AppColors.borderLight),
+              : AppColors.borderLight,
         ),
       ),
       child: Row(

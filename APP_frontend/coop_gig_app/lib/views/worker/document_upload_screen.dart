@@ -53,10 +53,13 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
     final auth = Provider.of<AuthController>(context);
     final profile = auth.currentUser?.workerProfile;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cooperative Verification Docs'),
-      ),
+    return Container(
+      decoration: const BoxDecoration(gradient: AppColors.sageGradient),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: const Text('Cooperative Verification Docs'),
+        ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         child: Column(
@@ -124,6 +127,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 

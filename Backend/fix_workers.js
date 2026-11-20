@@ -15,3 +15,4 @@ const workers = db.prepare(`
 
 console.log('Fixed workers status in DB:');
 console.table(workers);
+

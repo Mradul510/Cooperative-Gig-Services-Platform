@@ -53,9 +53,12 @@ class _JobRequestsScreenState extends State<JobRequestsScreen> {
     final pendingRequests = bookingCtrl.pendingRequests;
     final activeJobs = bookingCtrl.activeAcceptedJobs;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Cooperative Job Dispatch'),
+    return Container(
+      decoration: const BoxDecoration(gradient: AppColors.sageGradient),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: const Text('Cooperative Job Dispatch'),
         actions: [
           Padding(
             padding: const EdgeInsets.only(right: 12),
@@ -160,6 +163,7 @@ class _JobRequestsScreenState extends State<JobRequestsScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 

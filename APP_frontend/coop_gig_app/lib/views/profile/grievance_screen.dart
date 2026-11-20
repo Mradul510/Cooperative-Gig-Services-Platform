@@ -87,10 +87,13 @@ class _GrievanceScreenState extends State<GrievanceScreen> {
     final bookings = bookingCtrl.bookings;
     final grievances = bookingCtrl.grievances;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppStrings.get(context, 'grievance_desk')),
-      ),
+    return Container(
+      decoration: const BoxDecoration(gradient: AppColors.sageGradient),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: Text(AppStrings.get(context, 'grievance_desk')),
+        ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         child: Column(
@@ -287,6 +290,7 @@ class _GrievanceScreenState extends State<GrievanceScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 }

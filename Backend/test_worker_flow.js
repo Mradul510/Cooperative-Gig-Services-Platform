@@ -119,3 +119,4 @@ async function testWorkerFlow() {
 }
 
 testWorkerFlow().catch(console.error);
+

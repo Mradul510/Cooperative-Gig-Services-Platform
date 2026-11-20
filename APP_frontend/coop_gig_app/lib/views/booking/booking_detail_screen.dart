@@ -83,9 +83,13 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
     }
 
     if (booking == null) {
-      return Scaffold(
-        appBar: AppBar(title: const Text('Booking Details')),
-        body: const Center(child: CircularProgressIndicator()),
+      return Container(
+        decoration: const BoxDecoration(gradient: AppColors.sageGradient),
+        child: Scaffold(
+          backgroundColor: Colors.transparent,
+          appBar: AppBar(title: const Text('Booking Details')),
+          body: const Center(child: CircularProgressIndicator()),
+        ),
       );
     }
 
@@ -95,9 +99,12 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
         : (booking.workerName ?? 'Worker');
     final otherPartyMobile = isWorker ? booking.customerMobile : booking.workerMobile;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text('Booking #${booking.id}'),
+    return Container(
+      decoration: const BoxDecoration(gradient: AppColors.sageGradient),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: Text('Booking #${booking.id}'),
         actions: [
           IconButton(
             icon: const Icon(Icons.report_problem_outlined),
@@ -339,6 +346,7 @@ class _BookingDetailScreenState extends State<BookingDetailScreen> {
           ],
         ),
       ),
+    ),
     );
   }
 }

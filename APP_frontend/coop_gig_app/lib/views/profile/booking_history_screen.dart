@@ -34,10 +34,13 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
     final auth = Provider.of<AuthController>(context);
     final isWorker = auth.currentUser?.isWorker ?? false;
 
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(AppStrings.get(context, 'booking_history')),
-      ),
+    return Container(
+      decoration: const BoxDecoration(gradient: AppColors.sageGradient),
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        appBar: AppBar(
+          title: Text(AppStrings.get(context, 'booking_history')),
+        ),
       body: RefreshIndicator(
         onRefresh: () => bookingCtrl.fetchBookings(),
         child: bookingCtrl.isLoading && bookingCtrl.bookings.isEmpty
@@ -77,6 +80,7 @@ class _BookingHistoryScreenState extends State<BookingHistoryScreen> {
                       return _buildBookingItem(context, booking, isWorker, isDark);
                     },
                   ),
+        ),
       ),
     );
   }
