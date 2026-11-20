@@ -8,7 +8,10 @@ import 'controllers/auth_controller.dart';
 import 'controllers/category_controller.dart';
 import 'controllers/worker_controller.dart';
 import 'controllers/booking_controller.dart';
+import 'models/service.dart';
 import 'views/auth/splash_screen.dart';
+import 'views/home/home_screen.dart';
+import 'views/category/category_screen.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,7 +51,37 @@ class CoopGigApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: const SplashScreen(),
+      initialRoute: '/',
+      onGenerateRoute: (routeSettings) {
+        final rawName = routeSettings.name ?? '/';
+        final uri = Uri.parse(rawName);
+
+        if (uri.pathSegments.isNotEmpty && uri.pathSegments[0] == 'category') {
+          final catName = uri.pathSegments.length > 1
+              ? Uri.decodeComponent(uri.pathSegments[1])
+              : 'Cleaning';
+          final idMap = {'Cleaning': 1, 'Electrical': 2, 'Plumbing': 3, 'Carpentry': 4};
+          final catId = idMap[catName] ?? 1;
+          return MaterialPageRoute(
+            settings: routeSettings,
+            builder: (_) => CategoryScreen(
+              category: CategoryItem(id: catId, name: catName),
+            ),
+          );
+        }
+
+        if (rawName == '/home') {
+          return MaterialPageRoute(
+            settings: routeSettings,
+            builder: (_) => const HomeScreen(),
+          );
+        }
+
+        return MaterialPageRoute(
+          settings: routeSettings,
+          builder: (_) => const SplashScreen(),
+        );
+      },
     );
   }
 }

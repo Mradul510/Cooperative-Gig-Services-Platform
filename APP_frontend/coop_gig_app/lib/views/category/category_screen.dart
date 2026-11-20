@@ -14,6 +14,7 @@ import '../../widgets/service_tile.dart';
 import '../../widgets/trust_strip.dart';
 import '../../widgets/verified_badge.dart';
 import '../booking/booking_sheet.dart';
+import '../home/home_screen.dart';
 import 'filter_sheet.dart';
 import 'worker_list_screen.dart';
 
@@ -96,13 +97,24 @@ class _CategoryScreenState extends State<CategoryScreen> {
     final selectedService = categoryCtrl.selectedService ?? (services.isNotEmpty ? services.first : null);
     final categoryWorkers = workerCtrl.workers;
 
+    void navigateBack() {
+      if (Navigator.of(context).canPop()) {
+        Navigator.of(context).pop();
+      } else {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            settings: const RouteSettings(name: '/home'),
+            builder: (_) => const HomeScreen(),
+          ),
+        );
+      }
+    }
+
     return PopScope(
-      canPop: true,
+      canPop: false,
       onPopInvokedWithResult: (didPop, result) {
         if (didPop) return;
-        if (Navigator.of(context).canPop()) {
-          Navigator.of(context).pop();
-        }
+        navigateBack();
       },
       child: Container(
         decoration: BoxDecoration(
@@ -113,29 +125,27 @@ class _CategoryScreenState extends State<CategoryScreen> {
           appBar: AppBar(
             backgroundColor: Colors.transparent,
             elevation: 0,
-            leadingWidth: 68,
+            leadingWidth: 70,
             leading: Padding(
               padding: const EdgeInsets.only(left: 16),
               child: Center(
-                child: Material(
-                  color: isDark ? AppColors.surfaceDark : Colors.white,
-                  shape: const CircleBorder(),
-                  elevation: 2,
-                  shadowColor: Colors.black12,
-                  child: InkWell(
-                    customBorder: const CircleBorder(),
-                    onTap: () {
-                      if (Navigator.of(context).canPop()) {
-                        Navigator.of(context).pop();
-                      }
-                    },
-                    child: SizedBox(
-                      width: 40,
-                      height: 40,
-                      child: Icon(
-                        Icons.chevron_left_rounded,
-                        size: 26,
-                        color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                child: SizedBox(
+                  width: 42,
+                  height: 42,
+                  child: Material(
+                    color: isDark ? AppColors.surfaceDark : Colors.white,
+                    shape: const CircleBorder(),
+                    elevation: 2,
+                    shadowColor: Colors.black12,
+                    child: InkWell(
+                      customBorder: const CircleBorder(),
+                      onTap: navigateBack,
+                      child: Center(
+                        child: Icon(
+                          Icons.arrow_back_rounded,
+                          size: 22,
+                          color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+                        ),
                       ),
                     ),
                   ),
