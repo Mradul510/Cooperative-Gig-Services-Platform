@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../../models/service.dart';
+import '../../models/user.dart';
 import '../../controllers/auth_controller.dart';
 import '../../controllers/worker_controller.dart';
 import '../../controllers/category_controller.dart';
@@ -49,6 +50,7 @@ class _HomeScreenState extends State<HomeScreen> {
     final categoryCtrl = Provider.of<CategoryController>(context);
     final workerCtrl = Provider.of<WorkerController>(context);
     final user = auth.currentUser;
+    final isWorker = user?.isWorker ?? false;
 
     // Trade vector icons matching professional clean UI
     final categoryIcons = {
@@ -308,46 +310,52 @@ class _HomeScreenState extends State<HomeScreen> {
             const TrustStrip(),
             const SizedBox(height: 28),
 
-            // AVAILABLE WORKERS (5 KM) (Figma exact)
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  AppStrings.get(context, 'available_workers_title'),
-                  style: TextStyle(
-                    fontSize: 17,
-                    fontWeight: FontWeight.w800,
-                    letterSpacing: -0.3,
-                    color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
-                  ),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.of(context).push(
-                      BottomSlideRoute(
-                        page: const WorkerListScreen(title: 'Available Workers (5 km)'),
-                      ),
-                    );
-                  },
-                  child: Text(
-                    AppStrings.get(context, 'see_all'),
-                    style: const TextStyle(
-                      fontWeight: FontWeight.w700,
-                      fontSize: 13,
-                      color: AppColors.forestGreen,
+            // AVAILABLE WORKERS (5 KM) - ONLY SHOWN FOR CUSTOMERS (HIDDEN FOR WORKERS)
+            if (!isWorker) ...[
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    AppStrings.get(context, 'available_workers_title'),
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: FontWeight.w800,
+                      letterSpacing: -0.3,
+                      color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 12),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        BottomSlideRoute(
+                          page: const WorkerListScreen(title: 'Available Workers (5 km)'),
+                        ),
+                      );
+                    },
+                    child: Text(
+                      AppStrings.get(context, 'see_all'),
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w700,
+                        fontSize: 13,
+                        color: AppColors.forestGreen,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
 
-            // Worker Feed (or Figma-style placeholder / cards)
-            SizedBox(
-              height: 215,
-              child: _buildWorkerFeed(context, workerCtrl),
-            ),
-            const SizedBox(height: 24),
+              // Worker Feed (or Figma-style placeholder / cards)
+              SizedBox(
+                height: 215,
+                child: _buildWorkerFeed(context, workerCtrl),
+              ),
+              const SizedBox(height: 24),
+            ] else ...[
+              // WORKER DASHBOARD (GIGS, EARNINGS & CONTROLS INSTEAD OF AVAILABLE WORKERS)
+              _buildWorkerDashboardSection(context, user, isDark),
+              const SizedBox(height: 24),
+            ],
           ],
         ),
       ),
@@ -511,6 +519,152 @@ class _HomeScreenState extends State<HomeScreen> {
           },
         );
       },
+    );
+  }
+
+  Widget _buildWorkerDashboardSection(BuildContext context, User? user, bool isDark) {
+    final workerProfile = user?.workerProfile;
+    final trade = workerProfile?.tradeCategory ?? 'Home Services';
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Text(
+              'Worker Dashboard',
+              style: TextStyle(
+                fontSize: 17,
+                fontWeight: FontWeight.w800,
+                letterSpacing: -0.3,
+                color: isDark ? AppColors.textPrimaryDark : AppColors.textPrimaryLight,
+              ),
+            ),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: AppColors.forestGreen.withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: Text(
+                trade,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w700,
+                  color: AppColors.forestGreen,
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 14),
+        Row(
+          children: [
+            Expanded(
+              child: InkWell(
+                onTap: () {
+                  Navigator.of(context).push(
+                    BottomSlideRoute(page: const JobRequestsScreen()),
+                  );
+                },
+                borderRadius: BorderRadius.circular(18),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.surfaceDark : Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: isDark ? AppColors.borderDark : const Color(0xFFE2EBE5),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.primaryLight.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.assignment_turned_in_outlined, color: AppColors.primaryLight, size: 22),
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'Job Requests',
+                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        'View & accept incoming gigs',
+                        style: TextStyle(fontSize: 12, color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: InkWell(
+                onTap: () {
+                  Navigator.of(context).push(
+                    BottomSlideRoute(page: const EarningsScreen()),
+                  );
+                },
+                borderRadius: BorderRadius.circular(18),
+                child: Container(
+                  padding: const EdgeInsets.all(16),
+                  decoration: BoxDecoration(
+                    color: isDark ? AppColors.surfaceDark : Colors.white,
+                    borderRadius: BorderRadius.circular(18),
+                    border: Border.all(
+                      color: isDark ? AppColors.borderDark : const Color(0xFFE2EBE5),
+                    ),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: isDark ? 0.2 : 0.03),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(10),
+                        decoration: BoxDecoration(
+                          color: AppColors.verified.withValues(alpha: 0.1),
+                          shape: BoxShape.circle,
+                        ),
+                        child: const Icon(Icons.account_balance_wallet_outlined, color: AppColors.verified, size: 22),
+                      ),
+                      const SizedBox(height: 12),
+                      const Text(
+                        'My Earnings',
+                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 15),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        '85% payout & welfare cut',
+                        style: TextStyle(fontSize: 12, color: isDark ? AppColors.textSecondaryDark : AppColors.textSecondaryLight),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 
