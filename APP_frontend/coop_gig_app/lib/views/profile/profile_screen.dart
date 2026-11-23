@@ -32,6 +32,72 @@ class ProfileScreen extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         child: Column(
           children: [
+            // PERSONA SWITCHER CARD
+            Container(
+              width: double.infinity,
+              margin: const EdgeInsets.only(bottom: 14),
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.borderLight),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.03),
+                    blurRadius: 6,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    children: [
+                      const Icon(Icons.swap_horiz, size: 16, color: AppColors.primaryLight),
+                      const SizedBox(width: 6),
+                      Text(
+                        'Switch Persona',
+                        style: TextStyle(
+                          fontSize: 12,
+                          fontWeight: FontWeight.w700,
+                          color: AppColors.textPrimaryLight,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    children: [
+                      ActionChip(
+                        avatar: const Icon(Icons.engineering, size: 14, color: AppColors.forestGreen),
+                        label: const Text('Ramesh (Electrician)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+                        backgroundColor: (isWorker && user?.email == 'ramesh@coopgig.com') ? AppColors.forestGreenLight : Colors.white,
+                        side: BorderSide(color: (isWorker && user?.email == 'ramesh@coopgig.com') ? AppColors.forestGreen : AppColors.borderLight),
+                        onPressed: () => auth.switchToWorker(email: 'ramesh@coopgig.com'),
+                      ),
+                      ActionChip(
+                        avatar: const Icon(Icons.handyman, size: 14, color: AppColors.forestGreen),
+                        label: const Text('Vikram (Carpenter)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+                        backgroundColor: (isWorker && user?.email == 'vikram@coopgig.com') ? AppColors.forestGreenLight : Colors.white,
+                        side: BorderSide(color: (isWorker && user?.email == 'vikram@coopgig.com') ? AppColors.forestGreen : AppColors.borderLight),
+                        onPressed: () => auth.switchToWorker(email: 'vikram@coopgig.com'),
+                      ),
+                      ActionChip(
+                        avatar: const Icon(Icons.person, size: 14, color: AppColors.forestGreen),
+                        label: const Text('Priya (Customer)', style: TextStyle(fontSize: 11, fontWeight: FontWeight.w600)),
+                        backgroundColor: (!isWorker) ? AppColors.forestGreenLight : Colors.white,
+                        side: BorderSide(color: (!isWorker) ? AppColors.forestGreen : AppColors.borderLight),
+                        onPressed: () => auth.switchToCustomer(),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
             // USER INFO CARD (P-2)
             Container(
               width: double.infinity,

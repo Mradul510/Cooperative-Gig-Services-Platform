@@ -127,6 +127,52 @@ class _HomeScreenState extends State<HomeScreen> {
                     ],
                   ),
                 ),
+                // 1-Tap Mode Toggle: Worker Mode <-> Customer Mode
+                InkWell(
+                  onTap: () async {
+                    if (isWorker) {
+                      await auth.switchToCustomer();
+                    } else {
+                      await auth.switchToWorker();
+                    }
+                  },
+                  borderRadius: BorderRadius.circular(20),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 7),
+                    decoration: BoxDecoration(
+                      color: isWorker ? AppColors.forestGreen : Colors.white,
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: AppColors.forestGreen),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.04),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Icon(
+                          isWorker ? Icons.engineering : Icons.person_outline,
+                          size: 15,
+                          color: isWorker ? Colors.white : AppColors.forestGreen,
+                        ),
+                        const SizedBox(width: 5),
+                        Text(
+                          isWorker ? 'Worker' : 'Customer',
+                          style: TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w700,
+                            color: isWorker ? Colors.white : AppColors.forestGreen,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+                const SizedBox(width: 8),
                 // Circular White Bell Icon Button
                 Container(
                   width: 44,

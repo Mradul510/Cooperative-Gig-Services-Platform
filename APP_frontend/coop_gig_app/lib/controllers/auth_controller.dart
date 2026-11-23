@@ -38,9 +38,9 @@ class AuthController with ChangeNotifier {
         ApiService().setToken(_token);
         _currentUser = await ApiService().getMe();
       }
-      // If no session exists, auto-login as default customer so login is never required
+      // Auto-authenticate as worker (Ramesh Kumar - Electrician) so Worker Profile & Dashboard are open
       if (_currentUser == null) {
-        final data = await ApiService().login(identifier: 'priya@example.com', password: 'password123');
+        final data = await ApiService().login(identifier: 'ramesh@coopgig.com', password: 'password123');
         _token = data['token'];
         _currentUser = User.fromJson(data['user']);
         ApiService().setToken(_token);
@@ -54,6 +54,14 @@ class AuthController with ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  Future<bool> switchToWorker({String email = 'ramesh@coopgig.com'}) async {
+    return await login(email, 'password123');
+  }
+
+  Future<bool> switchToCustomer({String email = 'priya@example.com'}) async {
+    return await login(email, 'password123');
   }
 
   Future<bool> login(String identifier, String password) async {
