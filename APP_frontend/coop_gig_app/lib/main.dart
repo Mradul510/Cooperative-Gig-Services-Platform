@@ -12,6 +12,7 @@ import 'models/service.dart';
 import 'views/auth/splash_screen.dart';
 import 'views/home/home_screen.dart';
 import 'views/category/category_screen.dart';
+import 'widgets/virtual_device_emulator.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -52,6 +53,9 @@ class CoopGigApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
+      builder: (context, child) => VirtualDeviceEmulator(
+        child: child ?? const SizedBox(),
+      ),
       initialRoute: '/',
       onGenerateRoute: (routeSettings) {
         final rawName = routeSettings.name ?? '/';
