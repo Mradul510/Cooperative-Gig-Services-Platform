@@ -39,8 +39,15 @@ class _SplashScreenState extends State<SplashScreen> {
     );
   }
 
-  void _showAuthSheet() {
-    showModalBottomSheet(
+  bool _sheetDismissed = false;
+  bool _sheetOpen = false;
+
+  void _showAuthSheet() async {
+    if (_sheetOpen) return;
+    _sheetOpen = true;
+    setState(() => _sheetDismissed = false);
+
+    await showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       isDismissible: true,
@@ -48,6 +55,16 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: Colors.transparent,
       builder: (context) => const AuthSheet(),
     );
+
+    _sheetOpen = false;
+    if (!mounted) return;
+
+    final auth = Provider.of<AuthController>(context, listen: false);
+    if (auth.isAuthenticated) {
+      _navigateToHome();
+    } else {
+      setState(() => _sheetDismissed = true);
+    }
   }
 
   @override
@@ -98,14 +115,27 @@ class _SplashScreenState extends State<SplashScreen> {
               ),
             ),
             const SizedBox(height: 40),
-            const SizedBox(
-              width: 24,
-              height: 24,
-              child: CircularProgressIndicator(
-                strokeWidth: 2.5,
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+            if (_sheetDismissed)
+              ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: AppColors.primaryLight,
+                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                ),
+                onPressed: _showAuthSheet,
+                icon: const Icon(Icons.login, size: 18),
+                label: const Text('Sign In / Register', style: TextStyle(fontWeight: FontWeight.bold)),
+              )
+            else
+              const SizedBox(
+                width: 24,
+                height: 24,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.5,
+                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                ),
               ),
-            ),
           ],
         ),
       ),

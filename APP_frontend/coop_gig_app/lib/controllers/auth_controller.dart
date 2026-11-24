@@ -48,14 +48,6 @@ class AuthController with ChangeNotifier {
     }
   }
 
-  Future<bool> switchToWorker({String email = 'ramesh@coopgig.com'}) async {
-    return await login(email, 'password123');
-  }
-
-  Future<bool> switchToCustomer({String email = 'priya@example.com'}) async {
-    return await login(email, 'password123');
-  }
-
   Future<bool> login(String identifier, String password) async {
     _isLoading = true;
     _errorMessage = null;
