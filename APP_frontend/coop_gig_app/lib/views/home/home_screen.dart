@@ -32,12 +32,247 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _currentTabIndex = 0;
+  bool _isPopupShowing = false;
 
   @override
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadInitialData();
+      final auth = Provider.of<AuthController>(context, listen: false);
+      final bookingCtrl = Provider.of<BookingController>(context, listen: false);
+      if (auth.currentUser?.isWorker == true) {
+        bookingCtrl.startLiveDispatchPolling(intervalSeconds: 3);
+      }
+      bookingCtrl.onNewJobReceived.addListener(_handleIncomingJobRequest);
+    });
+  }
+
+  @override
+  void dispose() {
+    final bookingCtrl = Provider.of<BookingController>(context, listen: false);
+    bookingCtrl.onNewJobReceived.removeListener(_handleIncomingJobRequest);
+    bookingCtrl.stopLiveDispatchPolling();
+    super.dispose();
+  }
+
+  void _handleIncomingJobRequest() {
+    if (!mounted || _isPopupShowing) return;
+    final bookingCtrl = Provider.of<BookingController>(context, listen: false);
+    final newBooking = bookingCtrl.onNewJobReceived.value;
+    if (newBooking != null) {
+      _showIncomingJobPopup(newBooking);
+    }
+  }
+
+  void _showIncomingJobPopup(Booking booking) {
+    if (!mounted) return;
+    _isPopupShowing = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (ctx) => Dialog(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        backgroundColor: Colors.white,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+        child: Padding(
+          padding: const EdgeInsets.all(22),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Top Alert Header
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFFFEF3C7),
+                      shape: BoxShape.circle,
+                      border: Border.all(color: const Color(0xFFF59E0B), width: 1.5),
+                    ),
+                    child: const Icon(
+                      Icons.notifications_active_rounded,
+                      color: Color(0xFFD97706),
+                      size: 26,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '⚡ NEW JOB REQUEST!',
+                          style: TextStyle(
+                            fontSize: 16.5,
+                            fontWeight: FontWeight.w900,
+                            color: Color(0xFF92400E),
+                            letterSpacing: 0.3,
+                          ),
+                        ),
+                        SizedBox(height: 2),
+                        Text(
+                          'Nearby customer waiting for dispatch',
+                          style: TextStyle(fontSize: 12, color: AppColors.textSecondaryLight),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              const Divider(height: 1, color: AppColors.borderLight),
+              const SizedBox(height: 14),
+
+              // Job Details Box
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(14),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceLight,
+                  borderRadius: BorderRadius.circular(16),
+                  border: Border.all(color: AppColors.borderLight),
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Flexible(
+                          child: Text(
+                            booking.serviceTitle ?? 'Specialist Visit',
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: AppColors.textPrimaryLight,
+                            ),
+                          ),
+                        ),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFDCFCE7),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFF86EFAC)),
+                          ),
+                          child: Text(
+                            booking.slotType == 'immediate' ? 'Immediate' : 'Scheduled',
+                            style: const TextStyle(
+                              fontSize: 11,
+                              fontWeight: FontWeight.w700,
+                              color: Color(0xFF15803D),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        const Icon(Icons.person_outline, size: 15, color: AppColors.textSecondaryLight),
+                        const SizedBox(width: 4),
+                        Text(
+                          'Customer: ${booking.customerName ?? "Cooperative Member"}',
+                          style: const TextStyle(fontSize: 13, color: AppColors.textSecondaryLight, fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 10),
+                    const Divider(height: 1),
+                    const SizedBox(height: 10),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        const Text(
+                          'Guaranteed Take-Home (85%):',
+                          style: TextStyle(fontSize: 12.5, fontWeight: FontWeight.w600, color: AppColors.textSecondaryLight),
+                        ),
+                        Text(
+                          '₹${booking.workerPayout.toStringAsFixed(0)}',
+                          style: const TextStyle(
+                            fontSize: 19,
+                            fontWeight: FontWeight.w900,
+                            color: AppColors.forestGreen,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 20),
+
+              // Action Buttons
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      style: OutlinedButton.styleFrom(
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        side: const BorderSide(color: AppColors.borderLight),
+                      ),
+                      onPressed: () {
+                        Navigator.of(ctx).pop();
+                        Navigator.of(context).push(
+                          BottomSlideRoute(page: const JobRequestsScreen()),
+                        );
+                      },
+                      child: const Text('View All', style: TextStyle(fontWeight: FontWeight.w700, fontSize: 13)),
+                    ),
+                  ),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    flex: 2,
+                    child: ElevatedButton.icon(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.forestGreen,
+                        foregroundColor: Colors.white,
+                        elevation: 1,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      onPressed: () async {
+                        final bookingCtrl = Provider.of<BookingController>(context, listen: false);
+                        final messenger = ScaffoldMessenger.of(context);
+                        await bookingCtrl.updateStatus(booking.id, 'accepted');
+                        if (ctx.mounted) Navigator.of(ctx).pop();
+                        messenger.showSnackBar(
+                          const SnackBar(
+                            content: Text('🎉 Job Accepted! It is now in your active gigs.'),
+                            backgroundColor: AppColors.forestGreen,
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.check_circle_rounded, size: 18),
+                      label: const Text(
+                        'Accept Job Now',
+                        style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Center(
+                child: TextButton(
+                  onPressed: () => Navigator.of(ctx).pop(),
+                  child: const Text(
+                    'Decide Later',
+                    style: TextStyle(color: AppColors.textSecondaryLight, fontSize: 12),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    ).then((_) {
+      _isPopupShowing = false;
     });
   }
 
@@ -790,6 +1025,134 @@ class _HomeScreenState extends State<HomeScreen> {
         const TrustStrip(),
         const SizedBox(height: 24),
 
+        // INCOMING DISPATCH ALERT BANNER (Popped if pending requests exist)
+        if (bookingCtrl.pendingRequests.isNotEmpty) ...[
+          Container(
+            margin: const EdgeInsets.only(bottom: 22),
+            padding: const EdgeInsets.all(18),
+            decoration: BoxDecoration(
+              color: const Color(0xFFFEF3C7),
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFF59E0B), width: 1.8),
+              boxShadow: [
+                BoxShadow(
+                  color: const Color(0xFFF59E0B).withValues(alpha: 0.18),
+                  blurRadius: 12,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        const Icon(Icons.flash_on_rounded, color: Color(0xFFD97706), size: 22),
+                        const SizedBox(width: 6),
+                        Text(
+                          '${bookingCtrl.pendingRequests.length} NEW JOB REQUEST${bookingCtrl.pendingRequests.length > 1 ? "S" : ""} WAITING',
+                          style: const TextStyle(
+                            color: Color(0xFF92400E),
+                            fontWeight: FontWeight.w900,
+                            fontSize: 13,
+                            letterSpacing: 0.5,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFD97706),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: const Text(
+                        'NEW POP',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 10,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 10),
+                Text(
+                  '${bookingCtrl.pendingRequests.first.serviceTitle ?? "Specialist Service"} for ${bookingCtrl.pendingRequests.first.customerName ?? "Nearby Member"}',
+                  style: const TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: Color(0xFF78350F),
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  'Guaranteed Take-Home: ₹${bookingCtrl.pendingRequests.first.workerPayout.toStringAsFixed(0)} (85% Fair Living Wage)',
+                  style: const TextStyle(
+                    fontSize: 12.5,
+                    fontWeight: FontWeight.w600,
+                    color: Color(0xFF92400E),
+                  ),
+                ),
+                const SizedBox(height: 14),
+                Row(
+                  children: [
+                    Expanded(
+                      flex: 3,
+                      child: ElevatedButton.icon(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.forestGreen,
+                          foregroundColor: Colors.white,
+                          elevation: 1,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        onPressed: () async {
+                          final first = bookingCtrl.pendingRequests.first;
+                          await bookingCtrl.updateStatus(first.id, 'accepted');
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('🎉 Job Accepted! It is now in your active gigs.'),
+                                backgroundColor: AppColors.forestGreen,
+                              ),
+                            );
+                          }
+                        },
+                        icon: const Icon(Icons.check_circle_rounded, size: 18),
+                        label: const Text('Accept Job Now', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13.5)),
+                      ),
+                    ),
+                    const SizedBox(width: 10),
+                    Expanded(
+                      flex: 2,
+                      child: OutlinedButton(
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: const Color(0xFF92400E),
+                          side: const BorderSide(color: Color(0xFFD97706), width: 1.5),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                        ),
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            BottomSlideRoute(page: const JobRequestsScreen()),
+                          );
+                        },
+                        child: const Text('Job Requests', style: TextStyle(fontWeight: FontWeight.w800, fontSize: 13)),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+        ],
+
         // 4. ACTION HUB (2x2 GRID)
         Text(
           'Quick Operations',
@@ -809,11 +1172,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 title: 'Job Requests',
                 subtitle: 'Review & accept gigs',
                 icon: Icons.assignment_turned_in_outlined,
-                iconColor: AppColors.primaryLight,
+                iconColor: bookingCtrl.pendingRequests.isNotEmpty ? const Color(0xFFD97706) : AppColors.primaryLight,
+                borderColor: bookingCtrl.pendingRequests.isNotEmpty ? const Color(0xFFF59E0B) : null,
+                backgroundColor: bookingCtrl.pendingRequests.isNotEmpty ? const Color(0xFFFEF3C7) : null,
                 badgeText: bookingCtrl.pendingRequests.isNotEmpty
                     ? '${bookingCtrl.pendingRequests.length} New'
                     : null,
-                                onTap: () {
+                badgeColor: bookingCtrl.pendingRequests.isNotEmpty ? const Color(0xFFD97706) : null,
+                onTap: () {
                   Navigator.of(context).push(
                     BottomSlideRoute(page: const JobRequestsScreen()),
                   );
@@ -1017,23 +1383,32 @@ class _HomeScreenState extends State<HomeScreen> {
     required IconData icon,
     required Color iconColor,
     String? badgeText,
+    Color? badgeColor,
+    Color? borderColor,
+    Color? backgroundColor,
     required VoidCallback onTap,
   }) {
+    final effectiveBorderColor = borderColor ?? const Color(0xFFE2EBE5);
+    final effectiveBorderWidth = borderColor != null ? 2.0 : 1.0;
+
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(18),
       child: Container(
         padding: const EdgeInsets.all(14),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: backgroundColor ?? Colors.white,
           borderRadius: BorderRadius.circular(18),
           border: Border.all(
-            color: const Color(0xFFE2EBE5),
+            color: effectiveBorderColor,
+            width: effectiveBorderWidth,
           ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withValues(alpha: 0.03),
-              blurRadius: 8,
+              color: borderColor != null
+                  ? borderColor.withValues(alpha: 0.18)
+                  : Colors.black.withValues(alpha: 0.03),
+              blurRadius: borderColor != null ? 10 : 8,
               offset: const Offset(0, 2),
             ),
           ],
@@ -1056,7 +1431,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
                     decoration: BoxDecoration(
-                      color: iconColor.withValues(alpha: 0.12),
+                      color: (badgeColor ?? iconColor).withValues(alpha: 0.15),
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
@@ -1064,7 +1439,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       style: TextStyle(
                         fontSize: 10,
                         fontWeight: FontWeight.w800,
-                        color: iconColor,
+                        color: badgeColor ?? iconColor,
                       ),
                     ),
                   ),

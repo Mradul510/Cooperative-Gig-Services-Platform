@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../models/booking.dart';
 import '../models/grievance.dart';
@@ -9,10 +10,16 @@ class BookingController with ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
 
+  // Real-time dispatch polling
+  Timer? _pollTimer;
+  final Set<int> _knownPendingIds = {};
+  final ValueNotifier<Booking?> onNewJobReceived = ValueNotifier<Booking?>(null);
+
   List<Booking> get bookings => _bookings;
   List<Grievance> get grievances => _grievances;
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
+  bool get isPolling => _pollTimer != null && _pollTimer!.isActive;
 
   // Filtered lists for worker
   List<Booking> get pendingRequests =>
@@ -27,6 +34,50 @@ class BookingController with ChangeNotifier {
   double get totalWorkerEarnings =>
       completedBookings.fold(0.0, (sum, b) => sum + b.workerPayout);
 
+  /// Starts periodic background polling (default 3 seconds) for live dispatch requests
+  void startLiveDispatchPolling({int intervalSeconds = 3}) {
+    if (_pollTimer != null && _pollTimer!.isActive) return;
+
+    // Silent poll immediately
+    _silentPollBookings();
+
+    _pollTimer = Timer.periodic(Duration(seconds: intervalSeconds), (_) {
+      _silentPollBookings();
+    });
+  }
+
+  /// Stops background polling
+  void stopLiveDispatchPolling() {
+    _pollTimer?.cancel();
+    _pollTimer = null;
+  }
+
+  /// Silent fetch for background polling without triggering full-screen loading spinners
+  Future<void> _silentPollBookings() async {
+    try {
+      final fresh = await ApiService().getBookings();
+
+      // Check for any newly arrived pending bookings
+      for (final b in fresh) {
+        if (b.status == 'pending' && !_knownPendingIds.contains(b.id)) {
+          _knownPendingIds.add(b.id);
+          // Pop new job alert
+          onNewJobReceived.value = b;
+        }
+      }
+
+      // Sync known set with current pending
+      final currentPendingIds = fresh
+          .where((b) => b.status == 'pending')
+          .map((b) => b.id)
+          .toSet();
+      _knownPendingIds.removeWhere((id) => !currentPendingIds.contains(id));
+
+      _bookings = fresh;
+      notifyListeners();
+    } catch (_) {}
+  }
+
   Future<void> fetchBookings() async {
     _isLoading = true;
     _errorMessage = null;
@@ -34,6 +85,12 @@ class BookingController with ChangeNotifier {
 
     try {
       _bookings = await ApiService().getBookings();
+      // Record initial pending bookings to avoid false alert on initial load
+      for (final b in _bookings) {
+        if (b.status == 'pending') {
+          _knownPendingIds.add(b.id);
+        }
+      }
     } catch (e) {
       _errorMessage = e.toString().replaceAll('Exception: ', '');
     } finally {

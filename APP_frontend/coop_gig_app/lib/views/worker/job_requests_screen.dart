@@ -23,8 +23,16 @@ class _JobRequestsScreenState extends State<JobRequestsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      Provider.of<BookingController>(context, listen: false).fetchBookings();
+      final bookingCtrl = Provider.of<BookingController>(context, listen: false);
+      bookingCtrl.fetchBookings();
+      bookingCtrl.startLiveDispatchPolling(intervalSeconds: 3);
     });
+  }
+
+  @override
+  void dispose() {
+    // Keep polling active if worker returns to home screen
+    super.dispose();
   }
 
   void _respondToRequest(int bookingId, String status) async {
