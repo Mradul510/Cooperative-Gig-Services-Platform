@@ -498,7 +498,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   },
                 ),
               ],
-              const SizedBox(height: 30),
+              const SizedBox(height: 60),
             ],
           ),
         ),
@@ -786,7 +786,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                 onPressed: () => _openBookingSheet(worker),
                 icon: const Icon(Icons.calendar_today_rounded, size: 16),
                 label: Text(
-                  'Book ${worker.name.trim().split(" ").first} · ${AppConfig.formatINR(totalFee)}',
+                  'Book ${worker.name.trim().isNotEmpty ? worker.name.trim().split(" ").first : "Worker"} · ${AppConfig.formatINR(totalFee)}',
                   style: const TextStyle(
                     fontSize: 13.5,
                     fontWeight: FontWeight.w700,

@@ -19,7 +19,7 @@
 │ • No collective bargaining    │ • 10% dedicated cooperative welfare & pension  │
 │ • Opaque platform algorithms  │ • 5% platform maintenance & hosting fee        │
 │ • Arbitrary worker deplatform │ • Democratic society governance & grievance    │
-│ • Surface-level verification  │ • 3-Tier verification (Aadhaar, Police, Trade) │
+│ • Surface-level verification  │ • Cooperative verification (Aadhaar, e-Shram, Optional Trade) │
 └───────────────────────────────┴────────────────────────────────────────────────┘
 ```
 
@@ -29,7 +29,7 @@
 - **The Problem:**
   - **For Gig Workers:** Exploitative 25–35% platform cuts, arbitrary account penalties, lack of health insurance or retirement safety nets, and no pricing ownership.
   - **For Households:** High opaque markups, unpredictable quality, questionable contractor safety, and lack of accountability when things go wrong.
-  - **The Informal Sector Trap:** Off-platform hiring has zero price transparency, no police/trade vetting, and no legal recourse.
+  - **The Informal Sector Trap:** Off-platform hiring has zero price transparency, no e-Shram/labour registry vetting, and no legal recourse.
 - **The Cooperative Solution (CoopGig):**
   - Institutionalizes labor cooperatives in the digital age.
   - Transparent 85/10/5 economic model built directly into code.
@@ -45,7 +45,7 @@
    - Skilled tradesperson seeking dignity, predictable local gigs, and fair compensation.
    - Demands bilingual access (हिन्दी / English), zero hidden penalties, and accessible welfare funds.
 3. **The Cooperative Society Admin (Federation Official):**
-   - Stewards the worker community, reviews document compliance (Aadhaar, Police Clearance, Trade Certs), arbitrates disputes, and configures fair regional pricing.
+   - Stewards the worker community, reviews document compliance (Aadhaar, e-Shram Card, Optional Trade Certs), arbitrates disputes, and configures fair regional pricing.
 
 ---
 
@@ -99,7 +99,7 @@ flowchart TD
     end
 
     subgraph Society Governance
-        A1["Admin Verification Queue"] --> A2["Inspect Aadhaar & Police Cert"]
+        A1["Admin Verification Queue"] --> A2["Inspect Aadhaar & e-Shram Card"]
         A2 --> A3["Issue Verified Badge & Co-op Reg ID"]
         A3 --> A4["Arbitrate Customer Grievance"]
     end
@@ -111,12 +111,12 @@ flowchart TD
 ---
 
 ### Slide 6: Worker Trust & Verification Pipeline
-1. **Tier 1: Identity Authentication**
+1. **Tier 1: Identity Authentication (Mandatory)**
    - Government Aadhaar upload with manual/automated checksum verification.
-2. **Tier 2: Safety & Legal Clearance**
-   - Official District Police Verification certificate uploaded and audited by society officials.
-3. **Tier 3: Trade & Skill Certification**
-   - Skill India / ITI / Society Trade competency certification.
+2. **Tier 2: National Labour Registry (Mandatory)**
+   - Official Ministry of Labour & Employment e-Shram Card / UAN registration verified by cooperative officials.
+3. **Tier 3: Trade & Skill Certification (Optional)**
+   - Skill India / ITI / Society Trade competency certification (optional for onboarding).
    - Status indicators: `Approved` (Emerald Badge), `Pending` (Amber Banner), `Rejected` (Actionable reason provided).
 
 ---

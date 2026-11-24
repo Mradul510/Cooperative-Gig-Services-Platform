@@ -80,14 +80,14 @@ router.patch('/verifications/:workerId', (req, res) => {
         `UPDATE worker_profiles SET ${statusCol} = ?, ${reasonCol} = ? WHERE user_id = ?`
       ).run(newStatus, action === 'reject' ? reason.trim() : null, workerId);
 
-      // Re-fetch to check if all 3 docs are now approved
+      // Re-fetch to check if mandatory docs (Aadhaar & e-Shram Card) are approved. Trade certificate is optional.
       const updated = db.prepare('SELECT * FROM worker_profiles WHERE user_id = ?').get(workerId);
-      const allApproved =
+      const mandatoryApproved =
         updated.aadhaar_status      === 'approved' &&
-        updated.police_status       === 'approved' &&
-        updated.certificate_status  === 'approved';
+        updated.police_status       === 'approved'; // e-Shram Card
+      const certNotRejected = updated.certificate_status !== 'rejected';
 
-      if (allApproved) {
+      if (mandatoryApproved && certNotRejected) {
         db.prepare('UPDATE users SET is_verified = 1 WHERE id = ?').run(workerId);
         db.prepare('UPDATE worker_profiles SET welfare_active = 1 WHERE user_id = ?').run(workerId);
       }

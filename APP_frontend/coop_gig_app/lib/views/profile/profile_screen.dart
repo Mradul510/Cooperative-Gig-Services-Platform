@@ -127,7 +127,7 @@ class ProfileScreen extends StatelessWidget {
                   leading: const Icon(Icons.file_copy_outlined, color: AppColors.primaryLight),
                   title: const Text('Cooperative Documents & Verification', style: TextStyle(fontWeight: FontWeight.w600)),
                   subtitle: Text(
-                    user?.isVerified == true ? 'All 3 documents approved' : 'Review pending or incomplete',
+                    user?.isVerified == true ? 'Aadhaar & e-Shram verified' : 'Review pending or incomplete',
                     style: TextStyle(
                       fontSize: 12,
                       color: user?.isVerified == true ? AppColors.verified : AppColors.pending,

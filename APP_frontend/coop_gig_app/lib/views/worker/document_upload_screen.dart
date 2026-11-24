@@ -78,7 +78,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
                   SizedBox(width: 12),
                   Expanded(
                     child: Text(
-                      'All cooperative tradespeople are 100% verified for identity, police clearance, and trade skills before dispatch.',
+                      'All cooperative tradespeople are verified with Aadhaar and e-Shram registration before dispatch. Trade skill certificate is optional.',
                       style: TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
                     ),
                   ),
@@ -87,7 +87,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
             ),
             const SizedBox(height: 20),
 
-            // 1. Aadhaar Identity Document
+            // 1. Aadhaar Identity Document (Mandatory)
             _buildDocCard(
               context,
               title: AppStrings.get(context, 'doc_aadhaar'),
@@ -97,32 +97,35 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
               rejectionReason: profile?.aadhaarRejectionReason,
               docField: 'aadhaar_doc',
               isDark: isDark,
+              isOptional: false,
             ),
             const SizedBox(height: 14),
 
-            // 2. Police Verification Certificate
+            // 2. e-Shram Card (Mandatory - Replaced Police Verification)
             _buildDocCard(
               context,
               title: AppStrings.get(context, 'doc_police'),
-              subtitle: 'Character certificate from local police station',
-              icon: Icons.local_police_outlined,
+              subtitle: 'Ministry of Labour & Employment e-Shram / UAN Card (PDF/JPEG)',
+              icon: Icons.assignment_ind_outlined,
               status: profile?.policeStatus ?? 'pending',
               rejectionReason: profile?.policeRejectionReason,
               docField: 'police_doc',
               isDark: isDark,
+              isOptional: false,
             ),
             const SizedBox(height: 14),
 
-            // 3. Trade Certificate
+            // 3. Trade Certificate (Optional)
             _buildDocCard(
               context,
               title: AppStrings.get(context, 'doc_trade'),
-              subtitle: 'ITI certificate, skill diploma or cooperative reference',
+              subtitle: 'ITI certificate, skill diploma or cooperative reference (Optional)',
               icon: Icons.workspace_premium_outlined,
               status: profile?.certificateStatus ?? 'pending',
               rejectionReason: profile?.certificateRejectionReason,
               docField: 'certificate_doc',
               isDark: isDark,
+              isOptional: true,
             ),
           ],
         ),
@@ -140,6 +143,7 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
     required String? rejectionReason,
     required String docField,
     required bool isDark,
+    bool isOptional = false,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -158,9 +162,34 @@ class _DocumentUploadScreenState extends State<DocumentUploadScreen> {
               Icon(icon, color: AppColors.primaryLight, size: 22),
               const SizedBox(width: 10),
               Expanded(
-                child: Text(
-                  title,
-                  style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                child: Row(
+                  children: [
+                    Flexible(
+                      child: Text(
+                        title,
+                        style: const TextStyle(fontSize: 15, fontWeight: FontWeight.w700),
+                      ),
+                    ),
+                    if (isOptional) ...[
+                      const SizedBox(width: 6),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: Colors.amber.shade50,
+                          borderRadius: BorderRadius.circular(6),
+                          border: Border.all(color: Colors.amber.shade300),
+                        ),
+                        child: Text(
+                          'Optional',
+                          style: TextStyle(
+                            fontSize: 10,
+                            fontWeight: FontWeight.w700,
+                            color: Colors.amber.shade900,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ],
                 ),
               ),
               StatusBadge(status: status),
