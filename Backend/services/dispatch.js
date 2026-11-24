@@ -100,9 +100,10 @@ function dispatchWorkers(db, { lat, lng, radius = 5, category }) {
 
   const params = [];
 
-  if (category) {
-    query += ' AND LOWER(wp.trade_category) = LOWER(?)';
-    params.push(category);
+  if (category && category.trim().length > 0) {
+    const cleanCat = category.trim();
+    query += ' AND (LOWER(wp.trade_category) = LOWER(?) OR LOWER(wp.trade_category) LIKE LOWER(?))';
+    params.push(cleanCat, `%${cleanCat}%`);
   }
 
   const candidates = db.prepare(query).all(...params);

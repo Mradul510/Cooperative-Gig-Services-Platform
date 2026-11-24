@@ -47,17 +47,10 @@ router.get('/', (req, res) => {
     const db = req.app.locals.db;
     let { lat, lng, radius, category } = req.query;
 
-    if (!lat || !lng) {
-      return res.status(400).json({ success: false, error: 'lat and lng query parameters are required.' });
-    }
-
-    lat    = parseFloat(lat);
-    lng    = parseFloat(lng);
-    radius = Math.min(parseFloat(radius) || 5, 5); // max 5 km
-
-    if (isNaN(lat) || isNaN(lng)) {
-      return res.status(400).json({ success: false, error: 'lat and lng must be valid numbers.' });
-    }
+    // Use default Bhopal Central co-op coordinates if omitted
+    lat    = parseFloat(lat) || 23.2599;
+    lng    = parseFloat(lng) || 77.4126;
+    radius = Math.min(parseFloat(radius) || 5, 10); // radius in km
 
     const workers = dispatchWorkers(db, { lat, lng, radius, category });
     return res.json({ success: true, data: workers });
