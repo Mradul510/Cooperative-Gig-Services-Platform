@@ -95,7 +95,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
       return [
         ServiceItem(id: 7, categoryId: widget.category.id, title: 'Tap & Valve Repair', basePrice: 199, durationMins: 30),
         ServiceItem(id: 8, categoryId: widget.category.id, title: 'Pipe Leakage Fix', basePrice: 399, durationMins: 60),
-        ServiceItem(id: 9, categoryId: widget.category.id, title: 'Drainage Blockage Clear', basePrice: 499, durationMins: 60),
+        ServiceItem(id: 9, categoryId: widget.category.id, title: 'Water Heater Installation', basePrice: 699, durationMins: 120),
       ];
     } else if (name.contains('carpent')) {
       return [
@@ -306,76 +306,84 @@ class _CategoryScreenState extends State<CategoryScreen> {
               ),
               const SizedBox(height: 10),
 
-              // Service Cards Wrap / List
+              // SERVICE OPTIONS (100% Clickable with InkWell + Material)
               Column(
                 children: _services.map((service) {
                   final isSelected = _selectedService?.id == service.id;
                   final workerCut = (service.basePrice * 0.85).toStringAsFixed(0);
 
-                  return GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedService = service;
-                      });
-                    },
-                    child: Container(
-                      margin: const EdgeInsets.only(bottom: 10),
-                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
-                      decoration: BoxDecoration(
-                        color: isSelected ? AppColors.forestGreenLight : Colors.white,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: isSelected ? AppColors.forestGreen : AppColors.borderLight,
-                          width: isSelected ? 1.8 : 1.0,
-                        ),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.02),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
+                  return Container(
+                    margin: const EdgeInsets.only(bottom: 10),
+                    decoration: BoxDecoration(
+                      color: isSelected ? AppColors.forestGreenLight : Colors.white,
+                      borderRadius: BorderRadius.circular(16),
+                      border: Border.all(
+                        color: isSelected ? AppColors.forestGreen : AppColors.borderLight,
+                        width: isSelected ? 2.0 : 1.0,
                       ),
-                      child: Row(
-                        children: [
-                          Icon(
-                            isSelected ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
-                            color: isSelected ? AppColors.forestGreen : Colors.grey.shade400,
-                            size: 22,
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  service.title,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
-                                    color: AppColors.textPrimaryLight,
-                                  ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.03),
+                          blurRadius: 6,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Material(
+                      color: Colors.transparent,
+                      borderRadius: BorderRadius.circular(16),
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(16),
+                        onTap: () {
+                          setState(() {
+                            _selectedService = service;
+                          });
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 14),
+                          child: Row(
+                            children: [
+                              Icon(
+                                isSelected ? Icons.check_circle_rounded : Icons.radio_button_unchecked,
+                                color: isSelected ? AppColors.forestGreen : Colors.grey.shade400,
+                                size: 22,
+                              ),
+                              const SizedBox(width: 12),
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      service.title,
+                                      style: TextStyle(
+                                        fontSize: 14.5,
+                                        fontWeight: isSelected ? FontWeight.w800 : FontWeight.w600,
+                                        color: AppColors.textPrimaryLight,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 4),
+                                    Text(
+                                      'Duration: ${service.durationMins} mins · Worker gets ₹$workerCut',
+                                      style: const TextStyle(
+                                        fontSize: 12,
+                                        color: AppColors.textSecondaryLight,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 3),
-                                Text(
-                                  'Duration: ${service.durationMins} mins · Worker gets ₹$workerCut',
-                                  style: const TextStyle(
-                                    fontSize: 11.5,
-                                    color: AppColors.textSecondaryLight,
-                                  ),
+                              ),
+                              const SizedBox(width: 8),
+                              Text(
+                                AppConfig.formatINR(service.basePrice),
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w800,
+                                  color: AppColors.forestGreen,
                                 ),
-                              ],
-                            ),
+                              ),
+                            ],
                           ),
-                          Text(
-                            AppConfig.formatINR(service.basePrice),
-                            style: const TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.forestGreen,
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
                     ),
                   );
@@ -384,7 +392,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
               const SizedBox(height: 22),
 
-              // 3. AVAILABLE ONLINE WORKERS IN THIS CATEGORY
+              // 3. AVAILABLE ONLINE WORKERS
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -400,7 +408,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       ),
                       const SizedBox(width: 8),
                       Container(
-                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
                         decoration: BoxDecoration(
                           color: const Color(0xFFDCFCE7),
                           borderRadius: BorderRadius.circular(12),
@@ -479,6 +487,7 @@ class _CategoryScreenState extends State<CategoryScreen> {
                   ),
                 ),
               ] else ...[
+                // ONLINE WORKERS LIST
                 ListView.builder(
                   shrinkWrap: true,
                   physics: const NeverScrollableScrollPhysics(),
@@ -524,39 +533,47 @@ class _CategoryScreenState extends State<CategoryScreen> {
 
   Widget _buildOnlineWorkerCard(BuildContext context, WorkerFeedItem worker) {
     final activeService = _selectedService ??
-        (_services.isNotEmpty ? _services.first : ServiceItem(id: 1, categoryId: widget.category.id, title: 'Visit', basePrice: 399));
+        (_services.isNotEmpty
+            ? _services.first
+            : ServiceItem(id: 1, categoryId: widget.category.id, title: 'Service Visit', basePrice: 399));
 
     final totalFee = activeService.basePrice;
     final workerFee = (totalFee * 0.85).toStringAsFixed(0);
     final welfareFee = (totalFee * 0.10).toStringAsFixed(0);
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 14),
-      padding: const EdgeInsets.all(16),
+      margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: AppColors.borderLight),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
+            color: Colors.black.withValues(alpha: 0.04),
             blurRadius: 8,
             offset: const Offset(0, 3),
           ),
         ],
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // TOP ROW: Avatar + Name + Online badge
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Stack(
-                children: [
-                  CircleAvatar(
-                    radius: 26,
-                    backgroundColor: AppColors.forestGreen,
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // 1. TOP HEADER: Avatar + Name + Online Status Pill
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Avatar with online green ring
+                Container(
+                  width: 50,
+                  height: 50,
+                  decoration: BoxDecoration(
+                    color: AppColors.forestGreen,
+                    shape: BoxShape.circle,
+                    border: Border.all(color: const Color(0xFF22C55E), width: 2),
+                  ),
+                  child: Center(
                     child: Text(
                       worker.name.trim().isNotEmpty
                           ? (worker.name.trim().split(' ').length > 1
@@ -566,203 +583,219 @@ class _CategoryScreenState extends State<CategoryScreen> {
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.w800,
-                        fontSize: 14,
+                        fontSize: 15,
                       ),
                     ),
                   ),
-                  Positioned(
-                    right: 0,
-                    bottom: 0,
-                    child: Container(
-                      width: 14,
-                      height: 14,
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF22C55E),
-                        shape: BoxShape.circle,
-                        border: Border.all(color: Colors.white, width: 2),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 14),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      children: [
-                        Flexible(
-                          child: Text(
-                            worker.name,
-                            maxLines: 1,
-                            overflow: TextOverflow.ellipsis,
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w800,
-                              color: AppColors.textPrimaryLight,
-                            ),
-                          ),
-                        ),
-                        const SizedBox(width: 6),
-                        VerifiedBadge(isVerified: worker.isVerified),
-                      ],
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      '${worker.tradeCategory ?? widget.category.name} Specialist · Co-op Member',
-                      style: const TextStyle(
-                        fontSize: 12,
-                        fontWeight: FontWeight.w500,
-                        color: AppColors.textSecondaryLight,
-                      ),
-                    ),
-                  ],
                 ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-          const Divider(height: 1, color: AppColors.borderLight),
-          const SizedBox(height: 10),
-
-          // MIDDLE STATS ROW: Rating, Jobs, Distance, Online Status
-          Row(
-            children: [
-              Row(
-                children: [
-                  const Icon(Icons.star_rounded, size: 16, color: Colors.amber),
-                  const SizedBox(width: 3),
-                  Text(
-                    worker.ratingAvg > 0 ? worker.ratingAvg.toStringAsFixed(1) : '4.8',
-                    style: const TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                      color: AppColors.textPrimaryLight,
-                    ),
-                  ),
-                  const SizedBox(width: 4),
-                  Text(
-                    '(${worker.jobsCompleted > 0 ? worker.jobsCompleted : 40}+ jobs)',
-                    style: const TextStyle(
-                      fontSize: 11.5,
-                      color: AppColors.textSecondaryLight,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(width: 12),
-              Row(
-                children: [
-                  const Icon(Icons.location_on, size: 14, color: AppColors.coralPin),
-                  const SizedBox(width: 2),
-                  Text(
-                    '${worker.distanceKm > 0 ? worker.distanceKm.toStringAsFixed(1) : "0.5"} km away',
-                    style: const TextStyle(
-                      fontSize: 12,
-                      fontWeight: FontWeight.w600,
-                      color: AppColors.textPrimaryLight,
-                    ),
-                  ),
-                ],
-              ),
-              const Spacer(),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-                decoration: BoxDecoration(
-                  color: const Color(0xFFDCFCE7),
-                  borderRadius: BorderRadius.circular(10),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.bolt, size: 12, color: Color(0xFF16A34A)),
-                    SizedBox(width: 2),
-                    Text(
-                      'Online Now',
-                      style: TextStyle(
-                        fontSize: 11,
-                        fontWeight: FontWeight.w700,
-                        color: Color(0xFF16A34A),
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-
-          const SizedBox(height: 12),
-
-          // BOTTOM ROW: 85/10/5 breakdown + 1-Tap Book Button
-          Container(
-            padding: const EdgeInsets.all(12),
-            decoration: BoxDecoration(
-              color: AppColors.surfaceLight,
-              borderRadius: BorderRadius.circular(12),
-              border: Border.all(color: AppColors.borderLight),
-            ),
-            child: Row(
-              children: [
+                const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Row(
                         children: [
-                          Text(
-                            AppConfig.formatINR(totalFee),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w900,
-                              color: AppColors.forestGreen,
+                          Flexible(
+                            child: Text(
+                              worker.name,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w800,
+                                color: AppColors.textPrimaryLight,
+                              ),
                             ),
                           ),
                           const SizedBox(width: 6),
-                          const Text(
-                            'total price',
-                            style: TextStyle(
-                              fontSize: 11,
-                              color: AppColors.textSecondaryLight,
-                            ),
-                          ),
+                          VerifiedBadge(isVerified: worker.isVerified),
                         ],
                       ),
-                      const SizedBox(height: 2),
+                      const SizedBox(height: 3),
                       Text(
-                        'Worker: ₹$workerFee (85%) · Welfare: ₹$welfareFee',
+                        '${worker.tradeCategory ?? widget.category.name} Specialist · Co-op Member',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
                         style: const TextStyle(
-                          fontSize: 11,
-                          fontWeight: FontWeight.w600,
+                          fontSize: 12,
                           color: AppColors.textSecondaryLight,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ],
                   ),
                 ),
-                ElevatedButton.icon(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.forestGreen,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
-                    elevation: 1,
+                const SizedBox(width: 6),
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFDCFCE7),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFF86EFAC)),
                   ),
-                  onPressed: () => _openBookingSheet(worker),
-                  icon: const Icon(Icons.calendar_today_outlined, size: 15),
-                  label: const Text(
-                    'Book Now',
-                    style: TextStyle(
-                      fontSize: 13,
-                      fontWeight: FontWeight.w700,
-                    ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.circle, size: 8, color: Color(0xFF16A34A)),
+                      SizedBox(width: 4),
+                      Text(
+                        'Online',
+                        style: TextStyle(
+                          fontSize: 11,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF15803D),
+                        ),
+                      ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
+
+            const SizedBox(height: 12),
+            const Divider(height: 1, color: AppColors.borderLight),
+            const SizedBox(height: 10),
+
+            // 2. METRICS ROW: Rating, Jobs, Distance using Wrap to prevent any overflow
+            Wrap(
+              spacing: 12,
+              runSpacing: 6,
+              crossAxisAlignment: WrapCrossAlignment.center,
+              children: [
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.star_rounded, size: 16, color: Colors.amber),
+                    const SizedBox(width: 3),
+                    Text(
+                      worker.ratingAvg > 0 ? worker.ratingAvg.toStringAsFixed(1) : '4.8',
+                      style: const TextStyle(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w700,
+                        color: AppColors.textPrimaryLight,
+                      ),
+                    ),
+                    const SizedBox(width: 3),
+                    Text(
+                      '(${worker.jobsCompleted > 0 ? worker.jobsCompleted : 40}+ jobs)',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+                Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.location_on, size: 14, color: AppColors.coralPin),
+                    const SizedBox(width: 2),
+                    Text(
+                      '${worker.distanceKm > 0 ? worker.distanceKm.toStringAsFixed(1) : "0.5"} km away',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                        color: AppColors.textPrimaryLight,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+
+            const SizedBox(height: 14),
+
+            // 3. TRANSPARENT 85/10/5 BREAKDOWN BOX
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              decoration: BoxDecoration(
+                color: AppColors.surfaceLight,
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppColors.borderLight),
+              ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Flexible(
+                        child: Text(
+                          'Total Price (${activeService.title})',
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                          style: const TextStyle(
+                            fontSize: 12,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.textSecondaryLight,
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        AppConfig.formatINR(totalFee),
+                        style: const TextStyle(
+                          fontSize: 15,
+                          fontWeight: FontWeight.w800,
+                          color: AppColors.forestGreen,
+                        ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        'Worker Wage (85%): ₹$workerFee',
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w700,
+                          color: Color(0xFF166534),
+                        ),
+                      ),
+                      Text(
+                        'Welfare: ₹$welfareFee',
+                        style: const TextStyle(
+                          fontSize: 11,
+                          color: AppColors.textSecondaryLight,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+
+            const SizedBox(height: 12),
+
+            // 4. BOOKING BUTTON: Clean, prominent, full-width with 0 text overlap
+            SizedBox(
+              width: double.infinity,
+              height: 44,
+              child: ElevatedButton.icon(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.forestGreen,
+                  foregroundColor: Colors.white,
+                  elevation: 1,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                ),
+                onPressed: () => _openBookingSheet(worker),
+                icon: const Icon(Icons.calendar_today_rounded, size: 16),
+                label: Text(
+                  'Book ${worker.name.trim().split(" ").first} · ${AppConfig.formatINR(totalFee)}',
+                  style: const TextStyle(
+                    fontSize: 13.5,
+                    fontWeight: FontWeight.w700,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
