@@ -38,14 +38,6 @@ class AuthController with ChangeNotifier {
         ApiService().setToken(_token);
         _currentUser = await ApiService().getMe();
       }
-      // Auto-authenticate as worker (Ramesh Kumar - Electrician) so Worker Profile & Dashboard are open
-      if (_currentUser == null) {
-        final data = await ApiService().login(identifier: 'ramesh@coopgig.com', password: 'password123');
-        _token = data['token'];
-        _currentUser = User.fromJson(data['user']);
-        ApiService().setToken(_token);
-        await prefs.setString(_tokenKey, _token!);
-      }
     } catch (e) {
       _token = null;
       _currentUser = null;

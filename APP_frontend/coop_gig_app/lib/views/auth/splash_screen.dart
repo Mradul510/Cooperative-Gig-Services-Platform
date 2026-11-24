@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../controllers/auth_controller.dart';
 import '../../config/theme.dart';
 import '../../config/localization.dart';
 import '../../widgets/bottom_slide_route.dart';
 import '../home/home_screen.dart';
+import 'auth_sheet.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -19,14 +22,31 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   Future<void> _checkInitialAuth() async {
-    await Future.delayed(const Duration(milliseconds: 600));
+    await Future.delayed(const Duration(milliseconds: 1000));
     if (!mounted) return;
-    _navigateToHome();
+
+    final auth = Provider.of<AuthController>(context, listen: false);
+    if (auth.isAuthenticated) {
+      _navigateToHome();
+    } else {
+      _showAuthSheet();
+    }
   }
 
   void _navigateToHome() {
     Navigator.of(context).pushReplacement(
       BottomSlideRoute(page: const HomeScreen()),
+    );
+  }
+
+  void _showAuthSheet() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: true,
+      enableDrag: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => const AuthSheet(),
     );
   }
 
